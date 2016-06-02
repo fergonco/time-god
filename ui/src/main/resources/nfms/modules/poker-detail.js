@@ -35,8 +35,9 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
             .attr("class", "span-button")//
             .html("borrar")//
             .on("click", function(task) {
-               // TODO remove
+               bus.send("remove-task", [ pokerName, task.name ]);
             });
+
             selection//
             .append("span")//
             .html("Your estimation:")//

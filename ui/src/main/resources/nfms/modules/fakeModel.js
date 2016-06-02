@@ -45,6 +45,12 @@ define([ "message-bus" ], function(bus) {
       sendPoker(poker);
    });
 
+   bus.listen("remove-task", function(e, pokerName, taskName) {
+      var poker = pokers[findPokerIndex(pokerName)];
+      poker.tasks.splice(findTaskIndex(poker, taskName), 1);
+      sendPoker(poker);
+   });
+
    bus.listen("change-task-credits", function(e, userName, pokerName, taskName, credits) {
       var credits = parseInt(credits);
       if (!isNaN(credits)) {
