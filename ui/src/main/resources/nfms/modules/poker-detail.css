@@ -4,8 +4,9 @@
 
 .task-entry {
 	background-color: gray;
+	clear: both;
 }
 
-.task-entry .span-button {
+.task-entry span, .task-entry input {
 	float: right;
 }
