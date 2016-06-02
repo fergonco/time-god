@@ -1,0 +1,11 @@
+#poker-list {
+	max-width: 800px;
+}
+
+.poker-entry {
+	background-color: gray;
+}
+
+.poker-entry .span-button {
+	float: right;
+}

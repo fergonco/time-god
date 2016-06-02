@@ -1,0 +1,7 @@
+{
+	"requirejs" : {
+		"paths" : {
+			"d3" : "../jslib/d3"
+		}
+	}
+}

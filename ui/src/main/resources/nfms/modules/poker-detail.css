@@ -1,0 +1,11 @@
+#poker-detail {
+	max-width: 800px;
+}
+
+.task-entry {
+	background-color: gray;
+}
+
+.task-entry .span-button {
+	float: right;
+}
