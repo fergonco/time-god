@@ -1,8 +1,8 @@
 define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) {
 
-   // TODO hardcoded user
-   var userName = "fergonco";
-   var pokerName;
+   var userName = null;
+   var poker = null;
+   var currentView = null;
 
    var container = d3.select("body").append("div").attr("id", "poker-detail");
    container.style("display", "none");
@@ -15,15 +15,99 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
    .attr("class", "span-button")//
    .html("volver")//
    .on("click", function() {
-      bus.send("show-pokers");
+      bus.send("show-window", [ "pokers" ]);
    });
 
+   var INDIVIDUAL = "individual";
+   var COMMON = "common";
+   var PROGRESS = "progress";
+   var views = {};
+   views[INDIVIDUAL] = function(selection) {
+      selection.append("input")//
+      .attr("type", "text")//
+      .attr("value", function(task) {
+         var estimation = task.estimations[userName];
+         return estimation ? estimation : "";
+      })//
+      .on("change", function(task) {
+         bus.send("change-task-user-credits", [ userName, poker.name, task.name, this.value ]);
+      });
+      selection//
+      .append("span")//
+      .html("Your estimation:");
+   }
+
+   views[COMMON] = function(selection) {
+      selection.append(function(task) {
+         var div = document.createElement("div");
+         var estimationSelection = d3.select(div).selectAll(".estimation-summary").data(Object.keys(task.estimations));
+         estimationSelection.exit().remove();
+         estimationSelection.enter().append("div");
+         estimationSelection.attr("class", "estimation-summary");
+         estimationSelection.html(function(dev) {
+            return dev + ":" + task.estimations[dev]
+         });
+         return div;
+      });
+      selection.append("input")//
+      .attr("type", "text")//
+      .attr("value", function(task) {
+         return task.commonEstimation;
+      })//
+      .on("change", function(task) {
+         bus.send("change-task-common-credits", [ poker.name, task.name, this.value ]);
+      });
+      selection//
+      .append("span")//
+      .html("Valoración común:")//
+      .on("click", function() {
+         bus.send("show-pokers");
+      });
+   }
+
+   views[PROGRESS] = function(selection) {
+   }
+
+   var cmbViews = divButtons//
+   .append("select")//
+   .on("change", function() {
+      currentView = views[this.value];
+      assert(currentView, "no view selected");
+      refresh(poker.tasks);
+   });
+   cmbViews.append("option").attr("value", INDIVIDUAL).html("estimación individual");
+   cmbViews.append("option").attr("value", COMMON).html("puesta en común");
+   cmbViews.append("option").attr("value", PROGRESS).html("progreso del proyecto");
+
    editableList.buildAdd(container, function(text) {
-      bus.send("add-task-to-poker", [ pokerName, {
+      bus.send("add-task-to-poker", [ poker.name, {
          "name" : text,
-         "estimations" : {}
+         "estimations" : {},
+         "commonEstimation" : null
       } ]);
    });
+
+   function estimations(tasks) {
+      for (var i = 0; i < tasks.length; i++) {
+         var task = tasks[i];
+         if (Object.keys(task.estimations).length > 0) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   function commonEstimation(tasks) {
+      for (var i = 0; i < tasks.length; i++) {
+         var task = tasks[i];
+         if (task.commonEstimation == null) {
+            return false;
+         }
+      }
+
+      return true;
+   }
 
    function refresh(tasks) {
       editableList.refresh(container, tasks, "task-entry", {
@@ -35,39 +119,38 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
             .attr("class", "span-button")//
             .html("borrar")//
             .on("click", function(task) {
-               bus.send("remove-task", [ pokerName, task.name ]);
+               bus.send("remove-task", [ poker.name, task.name ]);
             });
-
-            selection//
-            .append("span")//
-            .html("Your estimation:")//
-            .on("click", function() {
-               bus.send("show-pokers");
-            });
-            selection.append("input")//
-            .attr("type", "text")//
-            .attr("value", function(task) {
-               var estimation = task.estimations[userName];
-               return estimation ? estimation : "";
-            })//
-            .on("change", function(task) {
-               bus.send("change-task-credits", [ userName, pokerName, task.name, this.value ]);
-            });
+            currentView(selection);
          }
       });
    }
 
-   bus.listen("show-poker", function(e) {
-      container.style("display", "block");
-   });
-   bus.listen("show-pokers", function() {
-      container.style("display", "none");
+   bus.listen("show-window", function(e, window) {
+      if (window == "poker") {
+         container.style("display", "block");
+         currentView = null;
+      } else {
+         container.style("display", "none");
+      }
    });
 
-   bus.listen("updated-poker", function(e, poker) {
+   bus.listen("updated-poker", function(e, newPoker) {
+      poker = newPoker;
       spnTitle.html(poker.name);
-      pokerName = poker.name;
+      if (currentView == null) {
+         if (!estimations(poker.tasks)) {
+            currentView = views[INDIVIDUAL];
+         } else if (!commonEstimation(poker.tasks)) {
+            currentView = views[COMMON];
+         } else {
+            currentView = views[ESTIMATED];
+         }
+      }
       refresh(poker.tasks);
+   });
+   bus.listen("set-user", function(e, newUserName) {
+      userName = newUserName;
    });
 
 });
