@@ -1,4 +1,4 @@
-define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) {
+define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bus, wsbus, editableList) {
 
    var userName = null;
    var poker = null;
@@ -119,7 +119,7 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
             .attr("class", "span-button")//
             .html("borrar")//
             .on("click", function(task) {
-               bus.send("remove-task", [ poker.name, task.name ]);
+               bus.send("remove-task-from-poker", [ poker.name, task.name ]);
             });
             currentView(selection);
          }
@@ -135,6 +135,11 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
       }
    });
 
+
+   bus.listen("selected-poker", function(e, poker) {
+      wsbus.send("get-poker", poker.name);
+   });
+   
    bus.listen("updated-poker", function(e, newPoker) {
       poker = newPoker;
       spnTitle.html(poker.name);
@@ -144,7 +149,7 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
          } else if (!commonEstimation(poker.tasks)) {
             currentView = views[COMMON];
          } else {
-            currentView = views[ESTIMATED];
+            currentView = views[PROGRESS];
          }
       }
       refresh(poker.tasks);

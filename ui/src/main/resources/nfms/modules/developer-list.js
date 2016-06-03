@@ -1,4 +1,4 @@
-define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) {
+define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bus, wsbus, editableList) {
 
    var container = d3.select("body").append("div").attr("id", "developer-list");
    container.style("display", "none");
@@ -37,6 +37,7 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
    bus.listen("show-window", function(e, window) {
       if (window == "developers") {
          container.style("display", "block");
+         wsbus.send("get-developers");
       } else {
          container.style("display", "none");
       }

@@ -1,4 +1,4 @@
-define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) {
+define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bus, wsbus, editableList) {
 
    var container = d3.select("body").append("div").attr("id", "poker-list");
    container.style("display", "none");
@@ -27,7 +27,7 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
             });
             selection.on("click", function(d) {
                bus.send("show-window", [ "poker" ]);
-               bus.send("updated-poker", d)
+               bus.send("selected-poker", d)
             });
          }
       });
@@ -36,6 +36,7 @@ define([ "d3", "message-bus", "editableList" ], function(d3, bus, editableList) 
    bus.listen("show-window", function(e, window) {
       if (window == "pokers") {
          container.style("display", "block");
+         wsbus.send("get-pokers");
       } else {
          container.style("display", "none");
       }
