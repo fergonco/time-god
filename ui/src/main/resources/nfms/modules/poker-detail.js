@@ -30,7 +30,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          return estimation ? estimation : "";
       })//
       .on("change", function(task) {
-         bus.send("change-task-user-credits", [ userName, poker.name, task.name, this.value ]);
+         bus.send("change-task-user-credits", [ userName, task.name, this.value ]);
       });
       selection//
       .append("span")//
@@ -55,7 +55,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          return task.commonEstimation;
       })//
       .on("change", function(task) {
-         bus.send("change-task-common-credits", [ poker.name, task.name, this.value ]);
+         bus.send("change-task-common-credits", [ task.name, this.value ]);
       });
       selection//
       .append("span")//
@@ -119,7 +119,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
             .attr("class", "span-button")//
             .html("borrar")//
             .on("click", function(task) {
-               bus.send("remove-task-from-poker", [ poker.name, task.name ]);
+               bus.send("remove-task", [ task.name ]);
             });
             currentView(selection);
          }
@@ -135,11 +135,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       }
    });
 
-
    bus.listen("selected-poker", function(e, poker) {
       wsbus.send("get-poker", poker.name);
    });
-   
+
    bus.listen("updated-poker", function(e, newPoker) {
       poker = newPoker;
       spnTitle.html(poker.name);

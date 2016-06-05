@@ -23,25 +23,22 @@ define([ "message-bus", "websocket-bus" ], function(bus, wsbus) {
       });
    });
 
-   bus.listen("remove-task-from-poker", function(e, pokerName, taskName) {
-      wsbus.send("remove-task-from-poker", {
-         "pokerName" : pokerName,
+   bus.listen("remove-task", function(e, taskName) {
+      wsbus.send("remove-task", {
          "taskName" : taskName
       });
    });
 
-   bus.listen("change-task-user-credits", function(e, userName, pokerName, taskName, credits) {
+   bus.listen("change-task-user-credits", function(e, userName, taskName, credits) {
       wsbus.send("change-task-user-credits", {
          "userName" : userName,
-         "pokerName" : pokerName,
          "taskName" : taskName,
          "credits" : credits
       });
    });
 
-   bus.listen("change-task-common-credits", function(e, pokerName, taskName, credits) {
+   bus.listen("change-task-common-credits", function(e, taskName, credits) {
       wsbus.send("change-task-common-credits", {
-         "pokerName" : pokerName,
          "taskName" : taskName,
          "credits" : credits
       });
