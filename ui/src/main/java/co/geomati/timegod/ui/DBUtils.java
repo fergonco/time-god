@@ -6,9 +6,11 @@ import javax.persistence.Persistence;
 
 public class DBUtils {
 
+	public static String JPA_CONF_NAME = "local-db";
+
 	public static EntityManager getEntityManager() {
 		EntityManagerFactory emf = Persistence
-				.createEntityManagerFactory("local-db");
+				.createEntityManagerFactory(JPA_CONF_NAME);
 		EntityManager em = emf.createEntityManager();
 		return em;
 	}
