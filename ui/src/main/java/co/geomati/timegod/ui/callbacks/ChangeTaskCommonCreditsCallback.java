@@ -15,9 +15,9 @@ public class ChangeTaskCommonCreditsCallback extends AbstractCallBack implements
 
 	public void messageReceived(WebsocketBus bus, JsonElement payload) {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
-		String taskName = updateTaskMessage.get("taskName").getAsString();
+		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();
-		Task task = em.find(Task.class, taskName);
+		Task task = em.find(Task.class, taskId);
 		em.getTransaction().begin();
 		task.setCommonEstimation(updateTaskMessage.get("credits").getAsInt());
 		em.getTransaction().commit();

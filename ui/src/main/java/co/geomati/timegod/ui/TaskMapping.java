@@ -55,6 +55,7 @@ public class TaskMapping implements JsonSerializer<Task>,
 	public JsonElement serialize(Task src, Type typeOfSrc,
 			JsonSerializationContext context) {
 		JsonObject ret = new JsonObject();
+		ret.addProperty("id", src.getId());
 		ret.addProperty("name", src.getName());
 		ret.addProperty("commonEstimation", src.getCommonEstimation());
 		JsonObject jsonEstimations = new JsonObject();

@@ -15,9 +15,9 @@ public class RemoveTaskCallback extends AbstractCallBack implements Callback {
 
 	public void messageReceived(WebsocketBus bus, JsonElement payload) {
 		JsonObject removeTaskMessage = payload.getAsJsonObject();
-		String taskName = removeTaskMessage.get("taskName").getAsString();
+		long taskId = removeTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();
-		Task task = em.find(Task.class, taskName);
+		Task task = em.find(Task.class, taskId);
 		Poker poker = task.getPoker();
 		em.getTransaction().begin();
 		poker.getTasks().remove(task);

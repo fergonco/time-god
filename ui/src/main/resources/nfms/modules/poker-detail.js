@@ -30,7 +30,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          return estimation ? estimation : "";
       })//
       .on("change", function(task) {
-         bus.send("change-task-user-credits", [ userName, task.name, this.value ]);
+         bus.send("change-task-user-credits", [ userName, task.id, this.value ]);
       });
       selection//
       .append("span")//
@@ -55,7 +55,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          return task.commonEstimation;
       })//
       .on("change", function(task) {
-         bus.send("change-task-common-credits", [ task.name, this.value ]);
+         bus.send("change-task-common-credits", [ task.id, this.value ]);
       });
       selection//
       .append("span")//
@@ -91,7 +91,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.remove(function(task) {
-      bus.send("remove-task", [ task.name ]);
+      bus.send("remove-task", [ task.id ]);
    });
 
    list.select(function(d) {

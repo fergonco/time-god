@@ -38,6 +38,8 @@ public class SaveAndBroadcastTest {
 		DBUtils.JPA_CONF_NAME = "testing";
 	}
 
+	private JsonElement lastResponse;
+
 	@After
 	public void testTearDown() {
 		EntityManager manager = DBUtils.getEntityManager();
@@ -85,6 +87,7 @@ public class SaveAndBroadcastTest {
 		ArgumentCaptor<JsonElement> captor = ArgumentCaptor
 				.forClass(JsonElement.class);
 		verify(bus).broadcast(eq(messageName), captor.capture());
+		lastResponse = captor.getValue();
 		return captor.getValue();
 	}
 
@@ -116,9 +119,11 @@ public class SaveAndBroadcastTest {
 	@Test
 	public void testRemoveTask() {
 		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("tasks").getAsJsonArray()
+				.get(0).getAsJsonObject().get("id").getAsLong();
 		Callback callback = new RemoveTaskCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
-		callback.messageReceived(bus, parse("{\"taskName\":\"t1\"}"));
+		callback.messageReceived(bus, parse("{\"taskId\":\"" + taskId + "\"}"));
 
 		JsonObject poker = (JsonObject) getResponse(bus, "updated-poker");
 		assertEquals(0, poker.get("tasks").getAsJsonArray().size());
@@ -128,10 +133,12 @@ public class SaveAndBroadcastTest {
 	public void testUpdateTaskUserCredits() {
 		testAddDeveloper();
 		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("tasks").getAsJsonArray()
+				.get(0).getAsJsonObject().get("id").getAsLong();
 		Callback callback = new ChangeTaskUserCreditsCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
 		callback.messageReceived(bus, parse("{\"userName\" : \"fergonco\","
-				+ "\"taskName\" : \"t1\"," + "\"credits\" : 12}"));
+				+ "\"taskId\" : \"" + taskId + "\"," + "\"credits\" : 12}"));
 
 		JsonObject poker = (JsonObject) getResponse(bus, "updated-poker");
 		assertEquals(12,
@@ -144,9 +151,11 @@ public class SaveAndBroadcastTest {
 	public void testUpdateTaskCommonCredits() {
 		testAddDeveloper();
 		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("tasks").getAsJsonArray()
+				.get(0).getAsJsonObject().get("id").getAsLong();
 		Callback callback = new ChangeTaskCommonCreditsCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
-		callback.messageReceived(bus, parse("{\"taskName\" : \"t1\","
+		callback.messageReceived(bus, parse("{\"taskId\" : \"" + taskId + "\","
 				+ "\"credits\" : 22}"));
 
 		JsonObject poker = (JsonObject) getResponse(bus, "updated-poker");

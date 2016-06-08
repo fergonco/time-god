@@ -3,6 +3,7 @@ package co.geomati.timegod.jpa;
 import java.util.ArrayList;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -11,6 +12,9 @@ import javax.persistence.OneToMany;
 public class Task {
 
 	@Id
+	@GeneratedValue
+	private long id;
+
 	private String name;
 
 	@OneToMany
@@ -57,4 +61,9 @@ public class Task {
 	public void setPoker(Poker poker) {
 		this.poker = poker;
 	}
+
+	public long getId() {
+		return id;
+	}
+
 }
