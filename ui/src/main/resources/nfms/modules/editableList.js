@@ -1,40 +1,72 @@
 define([ "d3" ], function() {
 
-   function buildAdd(container, newElement) {
+   function create(container) {
+      var add = null;
+      var remove = null;
+      var select = null;
+      var renderer = null;
+      var refresh = null;
+      var entryClassName = null;
+      var postProcess = null;
+
       var txtNew = container.append("input").attr("type", "text");
       container//
       .append("span")//
       .attr("class", "span-button")//
       .html("añadir")//
       .on("click", function() {
-         newElement(txtNew.property("value"));
+         add(txtNew.property("value"));
          txtNew.property("value", "");
       });
-   }
 
-   function refresh(container, list, entryClassName, params) {
-      params = params ? params : {};
-
-      var selection = container.selectAll("." + entryClassName).data(list);
-      selection.exit().remove();
-      selection.enter().append("div");
-      selection.attr("class", entryClassName);
-      selection.html(function(d) {
-         if (params.nameGetter) {
-            return params.nameGetter(d);
-         } else {
-            return d;
+      var instance = {
+         add : function(listener) {
+            add = listener;
+         },
+         remove : function(listener) {
+            remove = listener;
+         },
+         select : function(listener) {
+            select = listener;
+         },
+         renderer : function(listener) {
+            renderer = listener;
+         },
+         refresh : function(list) {
+            var selection = container.selectAll("." + entryClassName).data(list);
+            selection.exit().remove();
+            selection.enter().append("div");
+            selection.attr("class", entryClassName);
+            selection.html(function(d) {
+               return renderer(d);
+            });
+            selection.append("span")//
+            .attr("class", "span-button")//
+            .html("borrar")//
+            .on("click", function(d) {
+               remove(d);
+            });
+            selection.on("click", function(d) {
+               select(d);
+            });
+            if (postProcess != null) {
+               postProcess(selection);
+            }
+         },
+         entryClassName : function(className) {
+            entryClassName = className;
+         },
+         postProcess:function(postProcessFunction) {
+            postProcess = postProcessFunction;
          }
-      });
+      };
 
-      if (params.selectionPostprocess) {
-         params.selectionPostprocess(selection);
-      }
+      return instance;
    }
 
    return {
-      "buildAdd" : buildAdd,
-      "refresh" : refresh
+      "create" : create,
+
    }
 
 });
