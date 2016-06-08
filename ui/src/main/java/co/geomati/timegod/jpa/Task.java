@@ -17,6 +17,8 @@ public class Task {
 
 	private String name;
 
+	private String[] keywords;
+
 	@OneToMany
 	private ArrayList<Estimation> estimations;
 
@@ -66,4 +68,11 @@ public class Task {
 		return id;
 	}
 
+	public String[] getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String[] keywords) {
+		this.keywords = keywords;
+	}
 }

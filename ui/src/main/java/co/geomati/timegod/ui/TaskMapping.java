@@ -11,6 +11,7 @@ import co.geomati.timegod.jpa.Developer;
 import co.geomati.timegod.jpa.Estimation;
 import co.geomati.timegod.jpa.Task;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -33,6 +34,8 @@ public class TaskMapping implements JsonSerializer<Task>,
 		}
 		Task t = new Task();
 		t.setName(jsonTask.get("name").getAsString());
+		t.setKeywords(new Gson().fromJson(jsonTask.get("keywords"),
+				String[].class));
 		t.setCommonEstimation(getAsInteger(jsonTask.get("commonEstimation")));
 		ArrayList<Estimation> estimations = new ArrayList<Estimation>();
 		t.setEstimations(estimations);
@@ -57,6 +60,7 @@ public class TaskMapping implements JsonSerializer<Task>,
 		JsonObject ret = new JsonObject();
 		ret.addProperty("id", src.getId());
 		ret.addProperty("name", src.getName());
+		ret.add("keywords", new Gson().toJsonTree(src.getKeywords()));
 		ret.addProperty("commonEstimation", src.getCommonEstimation());
 		JsonObject jsonEstimations = new JsonObject();
 		ret.add("estimations", jsonEstimations);

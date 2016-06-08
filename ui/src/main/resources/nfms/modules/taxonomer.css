@@ -1,0 +1,13 @@
+.popup {
+	background-color: #777777;
+	height: 80%;
+	left: 10%;
+	position: absolute;
+	top: 10%;
+	width: 80%;
+}
+
+.taxonomy-item.selected {
+	background-color: blue;
+	color: white;
+}

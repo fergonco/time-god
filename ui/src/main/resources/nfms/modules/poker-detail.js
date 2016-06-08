@@ -55,6 +55,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          return task.commonEstimation;
       })//
       .on("change", function(task) {
+         bus.send("show-taxonomy", [ task, COMMON ]);
          bus.send("change-task-common-credits", [ task.id, this.value ]);
       });
       selection//
@@ -98,7 +99,16 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.renderer(function(d) {
-      return d.name;
+      var ret = d.name;
+      if (d.keywords) {
+         ret += "(";
+         for (var i = 0; i < d.keywords.length; i++) {
+            ret += d.keywords[i] + ",";
+
+         }
+         ret = ret.substring(0, ret.length - 1) + ")";
+      }
+      return ret;
    });
 
    list.postProcess(function(selection) {
