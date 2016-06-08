@@ -55,7 +55,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          return task.commonEstimation;
       })//
       .on("change", function(task) {
-         bus.send("show-taxonomy", [ task, COMMON ]);
+         bus.send("show-taxonomy", [ this, task, COMMON ]);
          bus.send("change-task-common-credits", [ task.id, this.value ]);
       });
       selection//

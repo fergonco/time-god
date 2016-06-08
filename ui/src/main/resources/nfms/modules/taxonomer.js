@@ -4,12 +4,18 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
    var keywords = [];
    var choiceQueue = [];
 
-   bus.listen("show-taxonomy", function(e, selectedTask, type) {
+   bus.listen("show-taxonomy", function(e, control, selectedTask, type) {
       task = selectedTask;
       keywords = [];
 
       // mostrar ventana
-      d3.select("body").append("div").attr("class", "popup").attr("id", "taxonomer");
+      var bounds = control.getBoundingClientRect();
+      d3.select("body").append("div").attr("id", "modal-overlay")//
+      .append("div")//
+      .attr("class", "popup")//
+      .attr("id", "taxonomer")//
+      .style("top", bounds.bottom + "px")//
+      .style("left", bounds.right + "px");
 
       // pedir taxonomia
       wsbus.send("get-taxonomy", type);
@@ -27,7 +33,7 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
             "taskId" : task.id,
             "keywords" : keywords
          });
-         d3.select("#taxonomer").remove();
+         d3.select("#modal-overlay").remove();
       }
    }
 
