@@ -73,18 +73,36 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    .on("change", function() {
       currentView = views[this.value];
       assert(currentView, "no view selected");
-      refresh(poker.tasks);
+      list.refresh(poker.tasks);
    });
    cmbViews.append("option").attr("value", INDIVIDUAL).html("estimación individual");
    cmbViews.append("option").attr("value", COMMON).html("puesta en común");
    cmbViews.append("option").attr("value", PROGRESS).html("progreso del proyecto");
 
-   editableList.buildAdd(container, function(text) {
+   var list = editableList.create(container);
+   list.entryClassName("task-entry");
+
+   list.add(function(text) {
       bus.send("add-task-to-poker", [ poker.name, {
          "name" : text,
          "estimations" : {},
          "commonEstimation" : null
       } ]);
+   });
+
+   list.remove(function(task) {
+      bus.send("remove-task", [ task.name ]);
+   });
+
+   list.select(function(d) {
+   });
+
+   list.renderer(function(d) {
+      return d.name;
+   });
+
+   list.postProcess(function(selection) {
+      currentView(selection);
    });
 
    function estimations(tasks) {
@@ -107,23 +125,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       }
 
       return true;
-   }
-
-   function refresh(tasks) {
-      editableList.refresh(container, tasks, "task-entry", {
-         nameGetter : function(t) {
-            return t.name;
-         },
-         selectionPostprocess : function(selection) {
-            selection.append("span")//
-            .attr("class", "span-button")//
-            .html("borrar")//
-            .on("click", function(task) {
-               bus.send("remove-task", [ task.name ]);
-            });
-            currentView(selection);
-         }
-      });
    }
 
    bus.listen("show-window", function(e, window) {
@@ -151,7 +152,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
             currentView = views[PROGRESS];
          }
       }
-      refresh(poker.tasks);
+      list.refresh(poker.tasks);
    });
    bus.listen("set-user", function(e, newUserName) {
       userName = newUserName;
