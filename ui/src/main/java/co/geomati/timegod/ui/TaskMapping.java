@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import co.geomati.timegod.jpa.Developer;
 import co.geomati.timegod.jpa.Estimation;
 import co.geomati.timegod.jpa.Task;
+import co.geomati.timegod.jpa.TimeSegment;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
@@ -19,9 +20,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 
 public class TaskMapping implements JsonSerializer<Task>,
 		JsonDeserializer<Task> {
+
+	private static final Gson DEFAULT_GSON = new Gson();
 
 	public Task deserialize(JsonElement json, Type typeOfT,
 			JsonDeserializationContext context) throws JsonParseException {
@@ -34,11 +38,12 @@ public class TaskMapping implements JsonSerializer<Task>,
 		}
 		Task t = new Task();
 		t.setName(jsonTask.get("name").getAsString());
-		t.setKeywords(new Gson().fromJson(jsonTask.get("keywords"),
+		t.setKeywords(DEFAULT_GSON.fromJson(jsonTask.get("keywords"),
 				String[].class));
 		t.setCommonEstimation(getAsInteger(jsonTask.get("commonEstimation")));
 		ArrayList<Estimation> estimations = new ArrayList<Estimation>();
 		t.setEstimations(estimations);
+
 		JsonObject jsonEstimations = jsonTask.get("estimations")
 				.getAsJsonObject();
 		Set<Entry<String, JsonElement>> entries = jsonEstimations.entrySet();
@@ -48,6 +53,12 @@ public class TaskMapping implements JsonSerializer<Task>,
 			estimation.setDeveloper(em.find(Developer.class, entry.getKey()));
 			estimations.add(estimation);
 		}
+
+		ArrayList<TimeSegment> timeSegments = DEFAULT_GSON.fromJson(
+				jsonTask.get("timeSegments"),
+				new TypeToken<ArrayList<TimeSegment>>() {
+				}.getType());
+		t.setTimeSegments(timeSegments);
 		return t;
 	}
 
@@ -60,7 +71,7 @@ public class TaskMapping implements JsonSerializer<Task>,
 		JsonObject ret = new JsonObject();
 		ret.addProperty("id", src.getId());
 		ret.addProperty("name", src.getName());
-		ret.add("keywords", new Gson().toJsonTree(src.getKeywords()));
+		ret.add("keywords", DEFAULT_GSON.toJsonTree(src.getKeywords()));
 		ret.addProperty("commonEstimation", src.getCommonEstimation());
 		JsonObject jsonEstimations = new JsonObject();
 		ret.add("estimations", jsonEstimations);
@@ -69,7 +80,7 @@ public class TaskMapping implements JsonSerializer<Task>,
 			jsonEstimations.addProperty(estimation.getDeveloper().getName(),
 					estimation.getValue());
 		}
-
+		ret.add("timeSegments", DEFAULT_GSON.toJsonTree(src.getTimeSegments()));
 		return ret;
 	}
 

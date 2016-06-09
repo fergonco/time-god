@@ -78,6 +78,27 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    }
 
    views[PROGRESS] = function(selection) {
+
+      function getTotalTime(task) {
+         var acum = 0;
+         for (var i = 0; i < task.timeSegments.length; i++) {
+            var timeSegment = task.timeSegments[i];
+            acum += timeSegment.end - timeSegment.start;
+         }
+         return acum / (1000 * 60 * 60);
+      }
+
+      selection//
+      .append("progress")//
+      .attr("title", function(task) {
+         return getTotalTime(task) + " de " + task.commonEstimation;
+      })//
+      .attr("max", "100")//
+      .attr("value", function(task) {
+         var acum = getTotalTime(task);
+         return 100 * acum / task.commonEstimation;
+      });
+
       selection//
       .append("span")//
       .attr("class", "span-button")//

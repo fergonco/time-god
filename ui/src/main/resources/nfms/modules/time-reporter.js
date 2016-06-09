@@ -34,9 +34,10 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
             var taxonomyProcessedListener = function(e, type, keywords) {
                if (type == "time") {
                   bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
-                  wsbus.send("report-time", {
+                  wsbus.send("report-task-time", {
                      "taskId" : task.id,
-                     "time" : time,
+                     "timeStart" : time.start,
+                     "timeEnd" : time.end,
                      "keywords" : keywords
                   });
                   d3.select("#time-overlay").remove();

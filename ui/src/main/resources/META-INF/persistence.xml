@@ -12,6 +12,7 @@
 		<class>co.geomati.timegod.jpa.Task</class>
 		<class>co.geomati.timegod.jpa.Estimation</class>
 		<class>co.geomati.timegod.jpa.Taxonomy</class>
+		<class>co.geomati.timegod.jpa.TimeSegment</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:h2:~/.timegod" />
@@ -30,6 +31,7 @@
 		<class>co.geomati.timegod.jpa.Task</class>
 		<class>co.geomati.timegod.jpa.Estimation</class>
 		<class>co.geomati.timegod.jpa.Taxonomy</class>
+		<class>co.geomati.timegod.jpa.TimeSegment</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:h2:/tmp/test" />

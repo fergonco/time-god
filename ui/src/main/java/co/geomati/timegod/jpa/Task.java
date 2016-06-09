@@ -22,6 +22,9 @@ public class Task {
 	@OneToMany
 	private ArrayList<Estimation> estimations;
 
+	@OneToMany
+	private ArrayList<TimeSegment> timeSegments;
+
 	@ManyToOne
 	private Poker poker;
 
@@ -37,6 +40,10 @@ public class Task {
 
 	public ArrayList<Estimation> getEstimations() {
 		return estimations;
+	}
+
+	public ArrayList<TimeSegment> getTimeSegments() {
+		return timeSegments;
 	}
 
 	public Integer getCommonEstimation() {
@@ -74,5 +81,9 @@ public class Task {
 
 	public void setKeywords(String[] keywords) {
 		this.keywords = keywords;
+	}
+
+	public void setTimeSegments(ArrayList<TimeSegment> timeSegments) {
+		this.timeSegments = timeSegments;
 	}
 }
