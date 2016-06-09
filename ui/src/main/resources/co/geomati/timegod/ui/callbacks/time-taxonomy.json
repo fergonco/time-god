@@ -1,0 +1,97 @@
+{
+   "type" : "sequence",
+   "children" : [ {
+      "name" : "lugar",
+      "text" : "Lugar de trabajo",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "casa",
+         "text" : "Casa"
+      }, {
+         "name" : "oficina",
+         "text" : "Oficina"
+      } ]
+   }, {
+      "name" : "lugar",
+      "text" : "Tipo habitación",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "espacio_cerrado",
+         "text" : "Se puede cerrar la puerta"
+      }, {
+         "name" : "espacio_abierto",
+         "text" : "Espacio abierto"
+      } ]
+   }, {
+      "name" : "ambiente",
+      "text" : "Ambiente",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "silencio",
+         "text" : "Silencio"
+      }, {
+         "name" : "ruido_personas",
+         "text" : "Ruido personas"
+      }, {
+         "name" : "otros_ruidos",
+         "text" : "Otros ruidos"
+      } ]
+   }, {
+      "name" : "proteccion_auditiva",
+      "text" : "Protección auditiva",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "ninguna",
+         "text" : "Ninguna, oigo todo"
+      }, {
+         "name" : "ruido_blanco",
+         "text" : "Ruido blanco"
+      }, {
+         "name" : "heavy_metal",
+         "text" : "Heavy metal a todo trapo"
+      } ]
+   }, {
+      "name" : "interrupciones",
+      "text" : "Interrupciones",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "interrupciones_ninguna",
+         "text" : "Ninguna"
+      }, {
+         "name" : "interrupciones_ocasional",
+         "text" : "Ocasional"
+      }, {
+         "name" : "interrupciones_regular",
+         "text" : "Regularmente"
+      } ]
+   }, {
+      "name" : "motivacion",
+      "text" : "Motivación",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "motivacion_nula",
+         "text" : "Ninguna"
+      }, {
+         "name" : "motivacion_normal",
+         "text" : "Normal"
+      }, {
+         "name" : "motivacion_mucha",
+         "text" : "Muy motivado"
+      } ]
+   }, {
+      "name" : "satisfaccion",
+      "text" : "Satisfacción",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "satisfaccion_mucha",
+         "text" : "Disfruté programando"
+      }, {
+         "name" : "satisfaccion_normal",
+         "text" : "Bueno..."
+      }, {
+         "name" : "satisfaccion_ninguna",
+         "text" : "Necesito darle un giro a mi vida"
+      } ]
+   } ]
+
+}

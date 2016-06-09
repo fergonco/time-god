@@ -1,23 +1,26 @@
 define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
 
-   var task = null;
+   var taxonomyType = null;
    var keywords = [];
    var choiceQueue = [];
 
-   bus.listen("show-taxonomy", function(e, control, selectedTask, type) {
-      task = selectedTask;
-      keywords = [];
+   var title;
 
-      // mostrar ventana
+   bus.listen("show-taxonomy", function(e, control, type) {
+      keywords = [];
+      taxonomyType = type;
+
       var bounds = control.getBoundingClientRect();
-      d3.select("body").append("div").attr("id", "modal-overlay")//
+      var container = d3.select("body").append("div")//
+      .attr("id", "taxonomy-overlay")//
+      .attr("class", "modal-overlay")//
       .append("div")//
-      .attr("class", "popup")//
       .attr("id", "taxonomer")//
       .style("top", bounds.bottom + "px")//
       .style("left", bounds.right + "px");
 
-      // pedir taxonomia
+      title = container.append("b");
+
       wsbus.send("get-taxonomy", type);
    });
 
@@ -29,18 +32,16 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
       if (choiceQueue.length > 0) {
          refresh(choiceQueue.pop());
       } else {
-         wsbus.send("change-task-keywords", {
-            "taskId" : task.id,
-            "keywords" : keywords
-         });
-         d3.select("#modal-overlay").remove();
+         bus.send("taxonomy-processed", [ taxonomyType, keywords ])
+         d3.select("#taxonomy-overlay").remove();
       }
    }
 
    function refresh(taxonomy) {
+      title.html(taxonomy.text);
       if (taxonomy.type == "sequence") {
          if (taxonomy.children) {
-            for (var i = 0; i < taxonomy.children.length; i++) {
+            for (var i = taxonomy.children.length - 1; i >= 0; i--) {
                choiceQueue.push(taxonomy.children[i]);
             }
          }

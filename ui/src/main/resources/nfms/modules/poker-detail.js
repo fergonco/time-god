@@ -55,7 +55,18 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          return task.commonEstimation;
       })//
       .on("change", function(task) {
-         bus.send("show-taxonomy", [ this, task, COMMON ]);
+         var taxonomyProcessedListener = function(e, type, keywords) {
+            if (type == COMMON) {
+               bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
+               wsbus.send("change-task-keywords", {
+                  "taskId" : task.id,
+                  "keywords" : keywords
+               });
+            }
+         };
+         bus.listen("taxonomy-processed", taxonomyProcessedListener);
+
+         bus.send("show-taxonomy", [ this, COMMON ]);
          bus.send("change-task-common-credits", [ task.id, this.value ]);
       });
       selection//
@@ -67,6 +78,14 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    }
 
    views[PROGRESS] = function(selection) {
+      selection//
+      .append("span")//
+      .attr("class", "span-button")//
+      .html("reporte horas")//
+      .on("click", function(task) {
+         bus.send("report-time", [ task ]);
+      });
+
    }
 
    var cmbViews = divButtons//
