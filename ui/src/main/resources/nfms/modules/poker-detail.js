@@ -141,7 +141,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    list.renderer(function(d) {
       var ret = d.name;
       if (d.keywords) {
-         ret += "(";
+         ret += "  (";
          for (var i = 0; i < d.keywords.length; i++) {
             ret += d.keywords[i] + ",";
 

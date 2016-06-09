@@ -6,14 +6,6 @@ define([ "d3", "message-bus" ], function(d3, bus) {
 
    bus.listen("modules-loaded", function() {
       bus.send("show-window", [ "developers" ]);
-      // bus.send("add-developer", "fergonco");
-      // bus.send("add-poker", {
-      // name : "foo",
-      // tasks : []
-      // });
-      //
-      // bus.send("set-user", "fergonco");
-      // bus.send("show-window", [ "pokers" ]);
    });
 
 });

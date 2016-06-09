@@ -18,7 +18,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    list.remove(function(p) {
       bus.send("remove-poker", [ p.name ]);
-      d3.event.stopPropagation();
    });
 
    list.select(function(d) {
@@ -27,7 +26,39 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.renderer(function(d) {
-      return d.name;
+      var ret = d.name;
+      if (d.keywords) {
+         ret += "  (";
+         for (var i = 0; i < d.keywords.length; i++) {
+            ret += d.keywords[i] + ",";
+
+         }
+         ret = ret.substring(0, ret.length - 1) + ")";
+      }
+      return ret;
+   });
+
+   list.postProcess(function(selection) {
+      selection//
+      .append("span")//
+      .attr("class", "span-button")//
+      .html("establecer keywords")//
+      .on("click", function(poker) {
+         var taxonomyProcessedListener = function(e, type, keywords) {
+            if (type == "poker") {
+               bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
+               wsbus.send("change-poker-keywords", {
+                  "pokerName" : poker.name,
+                  "keywords" : keywords
+               });
+            }
+         };
+         bus.listen("taxonomy-processed", taxonomyProcessedListener);
+
+         bus.send("show-taxonomy", [ this, "poker" ]);
+         d3.event.stopPropagation();
+      });
+
    });
 
    bus.listen("show-window", function(e, window) {

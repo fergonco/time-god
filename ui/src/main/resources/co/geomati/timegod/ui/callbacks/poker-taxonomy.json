@@ -1,0 +1,43 @@
+{
+   "type" : "sequence",
+   "children" : [ {
+      "name" : "tipo_cliente",
+      "text" : "Tipo de cliente",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "cliente_desarrollador",
+         "text" : "Entiende dinámica desarrollo"
+      }, {
+         "name" : "cliente_usuario",
+         "text" : "Cliente normal"
+      } ]
+   }, {
+      "name" : "tipo_contrato",
+      "text" : "Tipo de contrato",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "contrato_bolsa_horas",
+         "text" : "Bolsa de horas"
+      }, {
+         "name" : "contrato_por_objetivo",
+         "text" : "Por objetivo a precio cerrado"
+      } ]
+   }, {
+      "name" : "elicitacion_requisitos",
+      "text" : "Elicitación de los requisitos",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "elicitacion_software_existente",
+         "text" : "Mirando un software existente"
+      }, {
+         "name" : "elicitacion_casos_de_uso_cliente",
+         "text" : "Casos de uso con el cliente"
+      }, {
+         "name" : "elicitacion_propia",
+         "text" : "El cliente marca la dirección y nosotros hacemos lo que queremos"
+      }, {
+         "name" : "elicitacion_oscura",
+         "text" : "No sabemos muy bien"
+      } ]
+   } ]
+}

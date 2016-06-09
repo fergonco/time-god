@@ -45,9 +45,11 @@ define([ "d3" ], function() {
             .html("borrar")//
             .on("click", function(d) {
                remove(d);
+               d3.event.stopPropagation();
             });
             selection.on("click", function(d) {
                select(d);
+               d3.event.stopPropagation();
             });
             if (postProcess != null) {
                postProcess(selection);

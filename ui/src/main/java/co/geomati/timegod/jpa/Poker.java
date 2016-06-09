@@ -15,6 +15,8 @@ public class Poker {
 	@OneToMany(mappedBy = "poker")
 	private ArrayList<Task> tasks;
 
+	private String[] keywords;
+
 	public String getName() {
 		return name;
 	}
@@ -28,4 +30,7 @@ public class Poker {
 		return name;
 	}
 
+	public void setKeywords(String[] keywords) {
+		this.keywords = keywords;
+	}
 }
