@@ -1,4 +1,4 @@
-define([ "d3" ], function() {
+define([ "message-bus", "d3" ], function(bus) {
 
    function create(container) {
       var add = null;
@@ -44,7 +44,12 @@ define([ "d3" ], function() {
             .attr("class", "span-button")//
             .html("borrar")//
             .on("click", function(d) {
-               remove(d);
+               bus.send("jsdialogs.confirm", [ {
+                  "message" : "Are you sure you want to remove?",
+                  "okAction" : function() {
+                     remove(d);
+                  }
+               } ]);
                d3.event.stopPropagation();
             });
             selection.on("click", function(d) {
@@ -58,7 +63,7 @@ define([ "d3" ], function() {
          entryClassName : function(className) {
             entryClassName = className;
          },
-         postProcess:function(postProcessFunction) {
+         postProcess : function(postProcessFunction) {
             postProcess = postProcessFunction;
          }
       };
