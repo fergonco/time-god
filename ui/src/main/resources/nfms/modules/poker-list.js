@@ -26,16 +26,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.renderer(function(d) {
-      var ret = d.name;
-      if (d.keywords) {
-         ret += "  (";
-         for (var i = 0; i < d.keywords.length; i++) {
-            ret += d.keywords[i] + ",";
-
-         }
-         ret = ret.substring(0, ret.length - 1) + ")";
-      }
-      return ret;
+      return d.name;
    });
 
    list.postProcess(function(selection) {
@@ -57,6 +48,18 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
          bus.send("show-taxonomy", [ this, "poker" ]);
          d3.event.stopPropagation();
+      });
+
+      selection.attr("title", function(d) {
+         var ret = "";
+         if (d.keywords) {
+            for (var i = 0; i < d.keywords.length; i++) {
+               ret += d.keywords[i] + ",";
+
+            }
+            ret = ret.substring(0, ret.length - 1);
+         }
+         return ret;
       });
 
    });

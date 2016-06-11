@@ -1,13 +1,20 @@
 define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
 
+   var root = null;
    var taxonomyType = null;
    var keywords = [];
    var choiceQueue = [];
 
    var title;
+   var divKeywords;
 
-   bus.listen("show-taxonomy", function(e, control, type) {
+   function initialize(){
       keywords = [];
+      choiceQueue = [];
+   }
+   
+   bus.listen("show-taxonomy", function(e, control, type) {
+      initialize();
       taxonomyType = type;
 
       var bounds = control.getBoundingClientRect();
@@ -19,13 +26,15 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
       .style("top", bounds.bottom + "px")//
       .style("left", bounds.right + "px");
 
+      divKeywords = container.append("div");
       title = container.append("b");
 
       wsbus.send("get-taxonomy", type);
    });
 
-   bus.listen("updated-taxonomy", function(e, taxonomy) {
-      refresh(taxonomy);
+   bus.listen("updated-taxonomy", function(e, t) {
+      root = t;
+      refresh(t);
    });
 
    function next() {
@@ -85,9 +94,30 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
                next();
             });
          }
+         d3.select("#restart-taxonomer").remove();
+         d3.select("#taxonomer").append("span")//
+         .attr("class", "span-button")//
+         .attr("id", "restart-taxonomer")//
+         .html("Reiniciar")//
+         .on("click", function() {
+            initialize();
+            refresh(root);
+         });
+
       } else {
          next();
       }
+      updateKeywords();
+   }
+
+   function updateKeywords() {
+      var keywordSelection = divKeywords.selectAll(".keyword").data(keywords);
+      keywordSelection.exit().remove();
+      keywordSelection.enter().append("li");
+      keywordSelection.attr("class", "keyword")//
+      .html(function(k) {
+         return k;
+      });
    }
 
 });
