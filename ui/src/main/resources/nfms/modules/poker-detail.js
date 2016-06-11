@@ -127,6 +127,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       bus.send("add-task-to-poker", [ poker.name, {
          "name" : text,
          "estimations" : {},
+         "creationTime" : new Date().getTime(),
          "commonEstimation" : null
       } ]);
    });
@@ -154,7 +155,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
             }
             ret = ret.substring(0, ret.length - 1);
          }
-         return ret;
+         return ret + " | creationDate: " + new Date(t.creationTime);
       });
 
    });

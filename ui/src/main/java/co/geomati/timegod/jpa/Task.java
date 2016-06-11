@@ -19,6 +19,8 @@ public class Task {
 
 	private String[] keywords;
 
+	private long creationTime;
+
 	@OneToMany
 	private ArrayList<Estimation> estimations;
 
@@ -85,5 +87,13 @@ public class Task {
 
 	public void setTimeSegments(ArrayList<TimeSegment> timeSegments) {
 		this.timeSegments = timeSegments;
+	}
+
+	public void setCreationTime(long creationTime) {
+		this.creationTime = creationTime;
+	}
+
+	public long getCreationTime() {
+		return creationTime;
 	}
 }
