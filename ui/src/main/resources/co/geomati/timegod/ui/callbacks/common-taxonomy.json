@@ -1,45 +1,15 @@
 {
    "type" : "sequence",
    "children" : [ {
-      "name" : "tipo_tarea",
-      "text" : "Tipo de tarea",
+      "name" : "placeholder",
+      "text" : "Compilar y enviar a Fernando keywords que representen criterios que influyen en la estimación",
       "type" : "choice",
       "children" : [ {
-         "name" : "tipo_tarea_programacion",
-         "text" : "Programación",
-         "type" : "multiple-choice",
-         "children" : [ {
-            "name" : "java",
-            "text" : "Java"
-         }, {
-            "name" : "js",
-            "text" : "Javascript"
-         }, {
-            "name" : "android",
-            "text" : "Android"
-         } ]
+         "name" : "si",
+         "text" : "Sí"
       }, {
-         "name" : "tipo_tarea_capacitacion",
-         "text" : "Capacitación"
-      } ]
-   }, {
-      "name" : "experiencia",
-      "text" : "Experiencia",
-      "type" : "choice",
-      "children" : [ {
-         "name" : "experiencia_nunca",
-         "text" : "Nunca se hizo antes"
-      }, {
-         "name" : "experiencia_alguna_vez",
-         "text" : "Ya se hizo alguna vez",
-         "type" : "choice",
-         "children" : [ {
-            "name" : "palmamos",
-            "text" : "Salió significativamente mal"
-         }, {
-            "name" : "js",
-            "text" : "Salió aceptablemente bien"
-         } ]
+         "name" : "no_cuesta_nada",
+         "text" : "No cuesta nada"
       } ]
    } ]
 }

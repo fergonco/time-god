@@ -8,7 +8,7 @@
          "name" : "cliente_desarrollador",
          "text" : "Entiende dinámica desarrollo"
       }, {
-         "name" : "cliente_usuario",
+         "name" : "cliente_normal",
          "text" : "Cliente normal"
       } ]
    }, {
@@ -36,8 +36,22 @@
          "name" : "elicitacion_propia",
          "text" : "El cliente marca la dirección y nosotros hacemos lo que queremos"
       }, {
-         "name" : "elicitacion_oscura",
+         "name" : "elicitacion_no_sabemos",
          "text" : "No sabemos muy bien"
+      } ]
+   }, {
+      "name" : "gestion_riesgos",
+      "text" : "Gestión de riesgos",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "gestion_riesgos_sí",
+         "text" : "Sí"
+      }, {
+         "name" : "gestion_riesgos_informal",
+         "text" : "Informal"
+      }, {
+         "name" : "gestion_riesgos_sí",
+         "text" : "No"
       } ]
    } ]
 }
