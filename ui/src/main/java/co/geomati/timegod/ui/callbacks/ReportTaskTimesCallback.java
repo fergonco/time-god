@@ -6,6 +6,7 @@ import co.geomati.timegod.jpa.Task;
 import co.geomati.timegod.jpa.TimeSegment;
 import co.geomati.timegod.ui.DBUtils;
 import co.geomati.websocketBus.Callback;
+import co.geomati.websocketBus.Caller;
 import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
@@ -14,7 +15,8 @@ import com.google.gson.JsonObject;
 public class ReportTaskTimesCallback extends AbstractCallBack implements
 		Callback {
 
-	public void messageReceived(WebsocketBus bus, JsonElement payload) {
+	public void messageReceived(Caller caller, WebsocketBus bus,
+			JsonElement payload) {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();

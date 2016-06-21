@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import co.geomati.timegod.jpa.Taxonomy;
 import co.geomati.timegod.ui.DBUtils;
 import co.geomati.websocketBus.Callback;
+import co.geomati.websocketBus.Caller;
 import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
@@ -17,7 +18,8 @@ import com.google.gson.JsonParser;
 
 public class GetTaxonomyCallback extends AbstractCallBack implements Callback {
 
-	public void messageReceived(WebsocketBus bus, JsonElement payload) {
+	public void messageReceived(Caller caller, WebsocketBus bus,
+			JsonElement payload) {
 		EntityManager em = DBUtils.getEntityManager();
 		String taxonomyType = payload.getAsString();
 		Taxonomy taxonomy = em.find(Taxonomy.class, taxonomyType);

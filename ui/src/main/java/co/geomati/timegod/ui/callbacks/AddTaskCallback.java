@@ -6,6 +6,7 @@ import co.geomati.timegod.jpa.Poker;
 import co.geomati.timegod.jpa.Task;
 import co.geomati.timegod.ui.DBUtils;
 import co.geomati.websocketBus.Callback;
+import co.geomati.websocketBus.Caller;
 import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
@@ -13,7 +14,8 @@ import com.google.gson.JsonObject;
 
 public class AddTaskCallback extends AbstractCallBack implements Callback {
 
-	public void messageReceived(WebsocketBus bus, JsonElement payload) {
+	public void messageReceived(Caller caller, WebsocketBus bus,
+			JsonElement payload) {
 		JsonObject addTaskMessage = payload.getAsJsonObject();
 		Task task = GSON.fromJson(addTaskMessage.get("task"), Task.class);
 		String pokerName = addTaskMessage.get("pokerName").getAsString();
