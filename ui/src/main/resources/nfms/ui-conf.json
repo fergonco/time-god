@@ -1,7 +1,8 @@
 {
 	"requirejs" : {
 		"paths" : {
-			"d3" : "../jslib/d3"
+         "d3" : "../jslib/d3",
+         "markdown" : "../jslib/markdown"
 		}
 	}
 }

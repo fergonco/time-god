@@ -127,6 +127,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       bus.send("add-task-to-poker", [ poker.name, {
          "name" : text,
          "estimations" : {},
+         "wiki" : null,
          "creationTime" : new Date().getTime(),
          "commonEstimation" : null
       } ]);
@@ -137,6 +138,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.select(function(d) {
+      bus.send("show-task-wiki", [d]);
    });
 
    list.renderer(function(d) {
