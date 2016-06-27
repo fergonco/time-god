@@ -34,13 +34,27 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
             var taxonomyProcessedListener = function(e, type, keywords) {
                if (type == "time") {
                   bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
-                  wsbus.send("report-task-time", {
-                     "taskId" : task.id,
-                     "timeStart" : time.start,
-                     "timeEnd" : time.end,
-                     "keywords" : keywords
-                  });
-                  d3.select("#time-overlay").remove();
+                  String
+                  msg = "Resumen:<ul>" //
+                     + "<li>Tarea: " + task.name//
+                     + "</li><li>Inicio: " + new Date(time.start)//
+                     + "</li><li>Fin: " + new Date(time.end)//
+                     + "</li><li>Keywords: " + keywords + "</li></ul>";
+                  var dialogOptions = {
+                     "message" : msg,
+                     "okAction" : function() {
+                        wsbus.send("report-task-time", {
+                           "taskId" : task.id,
+                           "timeStart" : time.start,
+                           "timeEnd" : time.end,
+                           "keywords" : keywords
+                        });
+                     },
+                     "closeAction" : function() {
+                        d3.select("#time-overlay").remove();
+                     }
+                  };
+                  bus.send("jsdialogs.confirm", [ dialogOptions ]);
                }
             };
             bus.listen("taxonomy-processed", taxonomyProcessedListener);

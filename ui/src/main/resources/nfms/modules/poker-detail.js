@@ -29,6 +29,9 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          var estimation = task.estimations[userName];
          return estimation ? estimation : "";
       })//
+      .on("click", function(task) {
+         d3.event.stopPropagation();
+      })//
       .on("change", function(task) {
          bus.send("change-task-user-credits", [ userName, task.id, this.value ]);
       });
@@ -54,6 +57,9 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       .attr("value", function(task) {
          return task.commonEstimation;
       })//
+      .on("click", function(task) {
+         d3.event.stopPropagation();
+      })//
       .on("change", function(task) {
          var taxonomyProcessedListener = function(e, type, keywords) {
             if (type == COMMON) {
@@ -71,10 +77,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       });
       selection//
       .append("span")//
-      .html("Valoración común:")//
-      .on("click", function() {
-         bus.send("show-pokers");
-      });
+      .html("Valoración común:");
    }
 
    views[PROGRESS] = function(selection) {
@@ -104,6 +107,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       .attr("class", "span-button")//
       .html("reporte horas")//
       .on("click", function(task) {
+         d3.event.stopPropagation();
          bus.send("report-time", [ task ]);
       });
 
@@ -127,6 +131,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       bus.send("add-task-to-poker", [ poker.name, {
          "name" : text,
          "estimations" : {},
+         "wiki" : null,
          "creationTime" : new Date().getTime(),
          "commonEstimation" : null
       } ]);
@@ -137,6 +142,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.select(function(d) {
+      bus.send("show-task-wiki", [ d ]);
    });
 
    list.renderer(function(d) {
@@ -205,6 +211,15 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
             currentView = views[COMMON];
          } else {
             currentView = views[PROGRESS];
+         }
+      }
+      list.refresh(poker.tasks);
+   });
+   bus.listen("updated-task", function(e, newTask) {
+      for (var i = 0; i < poker.tasks.length; i++) {
+         if (poker.tasks[i].id == newTask.id) {
+            poker.tasks[i] = newTask;
+            break;
          }
       }
       list.refresh(poker.tasks);

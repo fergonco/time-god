@@ -38,6 +38,8 @@ public class TaskMapping implements JsonSerializer<Task>,
 		}
 		Task t = new Task();
 		t.setName(jsonTask.get("name").getAsString());
+		JsonElement jsonWiki = jsonTask.get("wiki");
+		t.setWiki(jsonWiki.isJsonNull() ? null : jsonWiki.getAsString());
 		t.setCreationTime(jsonTask.get("creationTime").getAsLong());
 		t.setKeywords(DEFAULT_GSON.fromJson(jsonTask.get("keywords"),
 				String[].class));
@@ -72,6 +74,7 @@ public class TaskMapping implements JsonSerializer<Task>,
 		JsonObject ret = new JsonObject();
 		ret.addProperty("id", src.getId());
 		ret.addProperty("name", src.getName());
+		ret.addProperty("wiki", src.getWiki());
 		ret.addProperty("creationTime", src.getCreationTime());
 		ret.add("keywords", DEFAULT_GSON.toJsonTree(src.getKeywords()));
 		ret.addProperty("commonEstimation", src.getCommonEstimation());
