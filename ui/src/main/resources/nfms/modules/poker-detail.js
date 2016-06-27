@@ -138,7 +138,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.select(function(d) {
-      bus.send("show-task-wiki", [d]);
+      bus.send("show-task-wiki", [ d ]);
    });
 
    list.renderer(function(d) {
@@ -207,6 +207,15 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
             currentView = views[COMMON];
          } else {
             currentView = views[PROGRESS];
+         }
+      }
+      list.refresh(poker.tasks);
+   });
+   bus.listen("updated-task", function(e, newTask) {
+      for (var i = 0; i < poker.tasks.length; i++) {
+         if (poker.tasks[i].id == newTask.id) {
+            poker.tasks[i] = newTask;
+            break;
          }
       }
       list.refresh(poker.tasks);
