@@ -10,7 +10,6 @@ define([ "developer-list-ui", "message-bus", "websocket-bus" ], function(ui, bus
 
    ui.removeDeveloper(function(d) {
       bus.send("remove-developer", [ d.name ]);
-      d3.event.stopPropagation();
    });
 
    ui.selectDeveloper(function(d) {
