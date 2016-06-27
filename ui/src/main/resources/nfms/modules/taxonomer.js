@@ -8,11 +8,11 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
    var title;
    var divKeywords;
 
-   function initialize(){
+   function initialize() {
       keywords = [];
       choiceQueue = [];
    }
-   
+
    bus.listen("show-taxonomy", function(e, control, type) {
       initialize();
       taxonomyType = type;
@@ -30,6 +30,12 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
       title = container.append("b");
 
       wsbus.send("get-taxonomy", type);
+
+      d3.select("body").on("keydown", function(){
+         if (d3.event.keyCode == 27) {
+            close();
+         }
+      });
    });
 
    bus.listen("updated-taxonomy", function(e, t) {
@@ -37,12 +43,17 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
       refresh(t);
    });
 
+   function close(){
+      d3.select("body").on("keydown", null);
+      d3.select("#taxonomy-overlay").remove();
+   }
+   
    function next() {
       if (choiceQueue.length > 0) {
          refresh(choiceQueue.pop());
       } else {
          bus.send("taxonomy-processed", [ taxonomyType, keywords ])
-         d3.select("#taxonomy-overlay").remove();
+         close();
       }
    }
 
