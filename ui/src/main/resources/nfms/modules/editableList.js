@@ -44,13 +44,13 @@ define([ "message-bus", "d3" ], function(bus) {
             .attr("class", "span-button")//
             .html("borrar")//
             .on("click", function(d) {
+               d3.event.stopPropagation();
                bus.send("jsdialogs.confirm", [ {
                   "message" : "Are you sure you want to remove?",
                   "okAction" : function() {
                      remove(d);
                   }
                } ]);
-               d3.event.stopPropagation();
             });
             selection.on("click", function(d) {
                select(d);

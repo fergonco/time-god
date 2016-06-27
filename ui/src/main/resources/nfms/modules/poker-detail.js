@@ -29,6 +29,9 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          var estimation = task.estimations[userName];
          return estimation ? estimation : "";
       })//
+      .on("click", function(task) {
+         d3.event.stopPropagation();
+      })//
       .on("change", function(task) {
          bus.send("change-task-user-credits", [ userName, task.id, this.value ]);
       });
@@ -54,6 +57,9 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       .attr("value", function(task) {
          return task.commonEstimation;
       })//
+      .on("click", function(task) {
+         d3.event.stopPropagation();
+      })//
       .on("change", function(task) {
          var taxonomyProcessedListener = function(e, type, keywords) {
             if (type == COMMON) {
@@ -71,10 +77,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       });
       selection//
       .append("span")//
-      .html("Valoración común:")//
-      .on("click", function() {
-         bus.send("show-pokers");
-      });
+      .html("Valoración común:");
    }
 
    views[PROGRESS] = function(selection) {
@@ -104,6 +107,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       .attr("class", "span-button")//
       .html("reporte horas")//
       .on("click", function(task) {
+         d3.event.stopPropagation();
          bus.send("report-time", [ task ]);
       });
 
