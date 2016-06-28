@@ -9,6 +9,46 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    var spnTitle = container.append("h1").html("Tareas de ").append("span");
 
+   bus.send("ui-input-field:create", {
+      "div" : "txt-project-totalCredits",
+      "parentDiv" : container.attr("id"),
+      "text" : "Duración del proyecto: ",
+      "changeListener" : function(value) {
+         wsbus.send("change-poker-totalCredits", {
+            "pokerName" : poker.name,
+            "totalCredits" : value
+         });
+      }
+   });
+
+   bus.send("ui-progress:create", {
+      "div" : "progress-project-estimated",
+      "parentDiv" : container.attr("id"),
+      "text" : "Total estimación de tareas: ",
+      "tooltip" : function() {
+         if (poker != null) {
+            return getTotalEstimation(poker) + " de " + poker.totalCredits;
+         } else {
+            return null;
+         }
+      }
+   });
+
+   bus.send("ui-progress:create", {
+      "div" : "progress-project-real",
+      "parentDiv" : container.attr("id"),
+      "text" : "Total consumido: ",
+      "tooltip" : function() {
+         if (poker != null) {
+            return getTotalReported(poker) + " de " + poker.totalCredits;
+         } else {
+            return null;
+         }
+      }
+   });
+
+   bus.send("ui-button:create", [ {} ]);
+
    var divButtons = container.append("div");
    divButtons//
    .append("span")//
@@ -82,15 +122,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    views[PROGRESS] = function(selection) {
 
-      function getTotalTime(task) {
-         var acum = 0;
-         for (var i = 0; i < task.timeSegments.length; i++) {
-            var timeSegment = task.timeSegments[i];
-            acum += timeSegment.end - timeSegment.start;
-         }
-         return acum / (1000 * 60 * 60);
-      }
-
       selection//
       .append("progress")//
       .attr("title", function(task) {
@@ -111,6 +142,14 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          bus.send("report-time", [ task ]);
       });
 
+   }
+   function getTotalTime(task) {
+      var acum = 0;
+      for (var i = 0; i < task.timeSegments.length; i++) {
+         var timeSegment = task.timeSegments[i];
+         acum += timeSegment.end - timeSegment.start;
+      }
+      return acum / (1000 * 60 * 60);
    }
 
    var cmbViews = divButtons//
@@ -214,7 +253,30 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          }
       }
       list.refresh(poker.tasks);
+      bus.send("progress-project-estimated-field-value-fill", (100 * getTotalEstimation(poker)) / poker.totalCredits);
+      bus.send("progress-project-real-field-value-fill", (100 * getTotalReported(poker)) / poker.totalCredits);
+      bus.send("txt-project-totalCredits-field-value-fill", poker.totalCredits);
    });
+   function getTotalEstimation(poker) {
+      var total = 0;
+      for (var i = 0; i < poker.tasks.length; i++) {
+         var task = poker.tasks[i];
+         if (task.commonEstimation) {
+            total += task.commonEstimation;
+         }
+      }
+
+      return total;
+   }
+   function getTotalReported(poker) {
+      var total = 0;
+      for (var i = 0; i < poker.tasks.length; i++) {
+         var task = poker.tasks[i];
+         total += getTotalTime(task);
+      }
+
+      return total;
+   }
    bus.listen("updated-task", function(e, newTask) {
       for (var i = 0; i < poker.tasks.length; i++) {
          if (poker.tasks[i].id == newTask.id) {

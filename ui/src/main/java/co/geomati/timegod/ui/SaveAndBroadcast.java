@@ -8,6 +8,7 @@ import co.geomati.timegod.ui.callbacks.AddDeveloperCallback;
 import co.geomati.timegod.ui.callbacks.AddPokerCallback;
 import co.geomati.timegod.ui.callbacks.AddTaskCallback;
 import co.geomati.timegod.ui.callbacks.ChangePokerKeywordsCallback;
+import co.geomati.timegod.ui.callbacks.ChangePokerTotalCreditsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskCommonCreditsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskKeywordsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskUserCreditsCallback;
@@ -32,6 +33,8 @@ public class SaveAndBroadcast implements ServletContextListener {
 		bus.addListener("add-poker", new AddPokerCallback());
 		bus.addListener("change-poker-keywords",
 				new ChangePokerKeywordsCallback());
+		bus.addListener("change-poker-totalCredits",
+				new ChangePokerTotalCreditsCallback());
 		bus.addListener("remove-poker", new RemovePokerCallback());
 		bus.addListener("add-task-to-poker", new AddTaskCallback());
 		bus.addListener("remove-task", new RemoveTaskCallback());

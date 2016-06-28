@@ -17,6 +17,8 @@ public class Poker {
 
 	private String[] keywords;
 
+	private int totalCredits;
+
 	public String getName() {
 		return name;
 	}
@@ -32,5 +34,9 @@ public class Poker {
 
 	public void setKeywords(String[] keywords) {
 		this.keywords = keywords;
+	}
+
+	public void setTotalCredits(int totalCredits) {
+		this.totalCredits = totalCredits;
 	}
 }
