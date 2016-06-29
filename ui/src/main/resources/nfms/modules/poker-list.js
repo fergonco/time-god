@@ -32,8 +32,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    list.postProcess(function(selection) {
       selection//
       .append("span")//
-      .attr("class", "span-button")//
-      .html("establecer keywords")//
       .on("click", function(poker) {
          var taxonomyProcessedListener = function(e, type, keywords) {
             if (type == "poker") {
@@ -48,6 +46,12 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
          bus.send("show-taxonomy", [ this, "poker" ]);
          d3.event.stopPropagation();
+      })//
+      .each(function(d, i) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "establecer keywords"
+         });
       });
 
       selection.attr("title", function(d) {

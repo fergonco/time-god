@@ -1,6 +1,7 @@
 define([ "message-bus", "d3" ], function(bus) {
 
    function create(container) {
+      var id = new Date().getTime();
       var add = null;
       var remove = null;
       var select = null;
@@ -10,11 +11,14 @@ define([ "message-bus", "d3" ], function(bus) {
       var postProcess = null;
 
       var txtNew = container.append("input").attr("type", "text");
-      container//
-      .append("span")//
-      .attr("class", "span-button")//
-      .html("añadir")//
-      .on("click", function() {
+
+      bus.send("ui-button:create", {
+         "div" : "editableList-btn-add-" + id,
+         "parentDiv" : container.attr("id"),
+         "text" : "Añadir",
+         "sendEventName" : "editableList-btn-add-" + id
+      });
+      bus.listen("editableList-btn-add-" + id, function() {
          add(txtNew.property("value"));
          txtNew.property("value", "");
       });
@@ -41,17 +45,21 @@ define([ "message-bus", "d3" ], function(bus) {
                return renderer(d);
             });
             selection.append("span")//
-            .attr("class", "span-button")//
-            .html("borrar")//
             .on("click", function(d) {
-               d3.event.stopPropagation();
                bus.send("jsdialogs.confirm", [ {
-                  "message" : "Are you sure you want to remove?",
+                  "message" : "Are you sure you want to remove " + renderer(d) + "?",
                   "okAction" : function() {
                      remove(d);
                   }
                } ]);
+            })//
+            .each(function(d, i) {
+               bus.send("ui-button:create", {
+                  "element" : this,
+                  "text" : "borrar"
+               });
             });
+
             selection.on("click", function(d) {
                select(d);
                d3.event.stopPropagation();

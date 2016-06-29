@@ -31,7 +31,7 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
 
       wsbus.send("get-taxonomy", type);
 
-      d3.select("body").on("keydown", function(){
+      d3.select("body").on("keydown", function() {
          if (d3.event.keyCode == 27) {
             close();
          }
@@ -43,11 +43,11 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
       refresh(t);
    });
 
-   function close(){
+   function close() {
       d3.select("body").on("keydown", null);
       d3.select("#taxonomy-overlay").remove();
    }
-   
+
    function next() {
       if (choiceQueue.length > 0) {
          refresh(choiceQueue.pop());
@@ -96,25 +96,28 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
             }
          });
          if (taxonomy.type == "multiple-choice") {
-            d3.select("#btnDone").remove();
-            d3.select("#taxonomer").append("span")//
-            .attr("class", "span-button")//
-            .attr("id", "btnDone")//
-            .html("Hecho")//
-            .on("click", function() {
+            bus.send("ui:remove", "btnDone");
+            bus.send("ui-button:create", {
+               "div" : "btnDone",
+               "parentDiv" : "taxonomer",
+               "text" : "Hecho",
+               "sendEventName" : "btnDone-click"
+            });
+            bus.listen("btnDone-click", function() {
                next();
             });
          }
-         d3.select("#restart-taxonomer").remove();
-         d3.select("#taxonomer").append("span")//
-         .attr("class", "span-button")//
-         .attr("id", "restart-taxonomer")//
-         .html("Reiniciar")//
-         .on("click", function() {
+         bus.send("ui:remove", "btnRestartTaxonomer");
+         bus.send("ui-button:create", {
+            "div" : "btnRestartTaxonomer",
+            "parentDiv" : "taxonomer",
+            "text" : "Reiniciar",
+            "sendEventName" : "btnRestartTaxonomer-click"
+         });
+         bus.listen("btnRestartTaxonomer-click", function() {
             initialize();
             refresh(root);
          });
-
       } else {
          next();
       }

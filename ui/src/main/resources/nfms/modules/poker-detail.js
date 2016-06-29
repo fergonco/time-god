@@ -49,13 +49,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    bus.send("ui-button:create", [ {} ]);
 
-   var divButtons = container.append("div");
-   divButtons//
-   .append("span")//
-   .attr("class", "span-button")//
-   .html("volver")//
-   .on("click", function() {
-      bus.send("show-window", [ "pokers" ]);
+   var divButtons = container.append("div").attr("id", "divButtons");
+   bus.send("ui-button:create", {
+      "div" : "poker-detail-back",
+      "parentDiv" : divButtons.attr("id"),
+      "text" : "Volver",
+      "sendEventName" : "show-window",
+      "sendEventMessage" : "pokers"
    });
 
    var INDIVIDUAL = "individual";
@@ -132,22 +132,25 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
          var acum = getTotalTime(task);
          return 100 * acum / task.commonEstimation;
       });
-
       selection//
       .append("span")//
-      .attr("class", "span-button")//
-      .html("reporte horas")//
-      .on("click", function(task) {
-         d3.event.stopPropagation();
-         bus.send("report-time", [ task ]);
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Reporte horas",
+            "sendEventName" : "report-time",
+            "sendEventMessage" : d
+         });
       });
 
    }
    function getTotalTime(task) {
       var acum = 0;
-      for (var i = 0; i < task.timeSegments.length; i++) {
-         var timeSegment = task.timeSegments[i];
-         acum += timeSegment.end - timeSegment.start;
+      if (task.timeSegments) {
+         for (var i = 0; i < task.timeSegments.length; i++) {
+            var timeSegment = task.timeSegments[i];
+            acum += timeSegment.end - timeSegment.start;
+         }
       }
       return acum / (1000 * 60 * 60);
    }
