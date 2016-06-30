@@ -1,6 +1,6 @@
-define([ "message-bus", "d3" ], function(bus) {
+define([ "message-bus", "ui-values", "d3" ], function(bus, uiValues) {
 
-   function create(container) {
+   function create(containerId) {
       var id = new Date().getTime();
       var add = null;
       var remove = null;
@@ -10,17 +10,20 @@ define([ "message-bus", "d3" ], function(bus) {
       var entryClassName = null;
       var postProcess = null;
 
-      var txtNew = container.append("input").attr("type", "text");
+      bus.send("ui-input-field:create", {
+         "div" : "txtAdd-" + id,
+         "parentDiv" : containerId
+      });
 
       bus.send("ui-button:create", {
          "div" : "editableList-btn-add-" + id,
-         "parentDiv" : container.attr("id"),
+         "parentDiv" : containerId,
          "text" : "Añadir",
          "sendEventName" : "editableList-btn-add-" + id
       });
       bus.listen("editableList-btn-add-" + id, function() {
-         add(txtNew.property("value"));
-         txtNew.property("value", "");
+         add(uiValues.get("txtAdd-" + id));
+         uiValues.set("txtAdd-" + id, "");
       });
 
       var instance = {
@@ -37,7 +40,7 @@ define([ "message-bus", "d3" ], function(bus) {
             renderer = listener;
          },
          refresh : function(list) {
-            var selection = container.selectAll("." + entryClassName).data(list);
+            var selection = d3.select("#" + containerId).selectAll("." + entryClassName).data(list);
             selection.exit().remove();
             selection.enter().append("div");
             selection.attr("class", entryClassName);

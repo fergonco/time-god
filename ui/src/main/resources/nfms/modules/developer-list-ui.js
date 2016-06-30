@@ -1,11 +1,16 @@
 define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bus, wsbus, editableList) {
 
-   var container = d3.select("body").append("div").attr("id", "developer-list");
-   container.style("display", "none");
+   var developerListId = "developer-list";
+   
+   bus.send("ui-element:create", {
+      "type" : "div",
+      "div" : developerListId,
+      "parentDiv" : null,
+      "html" : "<h1>devélopers devélopers devélopers</h1>"
+   });
 
-   var spnTitle = container.append("h1").html("devélopers devélopers devélopers");
-
-   var list = editableList.create(container);
+   bus.send("ui-hide", developerListId);
+   var list = editableList.create(developerListId);
 
    return {
       addDeveloper : list.add,
@@ -15,10 +20,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       refresh : list.refresh,
       entryClassName : list.entryClassName,
       show : function() {
-         container.style("display", "block");
+         bus.send("ui-show", developerListId);
       },
       hide : function() {
-         container.style("display", "none");
+         bus.send("ui-hide", developerListId);
       }
    }
 });

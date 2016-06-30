@@ -96,7 +96,7 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
             }
          });
          if (taxonomy.type == "multiple-choice") {
-            bus.send("ui:remove", "btnDone");
+            bus.send("ui-remove", "btnDone");
             bus.send("ui-button:create", {
                "div" : "btnDone",
                "parentDiv" : "taxonomer",
@@ -107,7 +107,7 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
                next();
             });
          }
-         bus.send("ui:remove", "btnRestartTaxonomer");
+         bus.send("ui-remove", "btnRestartTaxonomer");
          bus.send("ui-button:create", {
             "div" : "btnRestartTaxonomer",
             "parentDiv" : "taxonomer",

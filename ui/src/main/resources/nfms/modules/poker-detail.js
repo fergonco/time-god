@@ -4,14 +4,24 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    var poker = null;
    var currentView = null;
 
-   var container = d3.select("body").append("div").attr("id", "poker-detail");
-   container.style("display", "none");
+   var pokerDetailId = "poker-detail";
 
-   var spnTitle = container.append("h1").html("Tareas de ").append("span");
+   bus.send("ui-element:create", {
+      "type" : "div",
+      "div" : pokerDetailId,
+      "parentDiv" : null
+   });
+   bus.send("ui-hide", pokerDetailId);
+
+   bus.send("ui-element:create", {
+      "type" : "span",
+      "div" : "poker-detail-title",
+      "parentDiv" : pokerDetailId
+   });
 
    bus.send("ui-input-field:create", {
       "div" : "txt-project-totalCredits",
-      "parentDiv" : container.attr("id"),
+      "parentDiv" : pokerDetailId,
       "text" : "Duración del proyecto: ",
       "changeListener" : function(value) {
          wsbus.send("change-poker-totalCredits", {
@@ -23,7 +33,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    bus.send("ui-progress:create", {
       "div" : "progress-project-estimated",
-      "parentDiv" : container.attr("id"),
+      "parentDiv" : pokerDetailId,
       "text" : "Total estimación de tareas: ",
       "tooltip" : function() {
          if (poker != null) {
@@ -36,7 +46,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    bus.send("ui-progress:create", {
       "div" : "progress-project-real",
-      "parentDiv" : container.attr("id"),
+      "parentDiv" : pokerDetailId,
       "text" : "Total consumido: ",
       "tooltip" : function() {
          if (poker != null) {
@@ -47,12 +57,16 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       }
    });
 
-   bus.send("ui-button:create", [ {} ]);
+   var divButtonsId = "div-buttons";
+   bus.send("ui-element:create", {
+      "type" : "div",
+      "div" : divButtonsId,
+      "parentDiv" : pokerDetailId
+   });
 
-   var divButtons = container.append("div").attr("id", "divButtons");
    bus.send("ui-button:create", {
       "div" : "poker-detail-back",
-      "parentDiv" : divButtons.attr("id"),
+      "parentDiv" : divButtonsId,
       "text" : "Volver",
       "sendEventName" : "show-window",
       "sendEventMessage" : "pokers"
@@ -155,18 +169,28 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       return acum / (1000 * 60 * 60);
    }
 
-   var cmbViews = divButtons//
-   .append("select")//
-   .on("change", function() {
-      currentView = views[this.value];
+   bus.send("ui-choice-field:create", {
+      "div" : "task-view-choice",
+      "parentDiv" : divButtonsId,
+      "values" : [ {
+         "text" : "estimación individual",
+         "value" : INDIVIDUAL
+      }, {
+         "text" : "puesta en común",
+         "value" : COMMON
+      }, {
+         "text" : "progreso del proyecto",
+         "value" : PROGRESS
+      } ],
+      "changeEventName" : "taskViewChanged"
+   });
+   bus.listen("taskViewChanged", function(e, value) {
+      currentView = views[value];
       assert(currentView, "no view selected");
       list.refresh(poker.tasks);
    });
-   cmbViews.append("option").attr("value", INDIVIDUAL).html("estimación individual");
-   cmbViews.append("option").attr("value", COMMON).html("puesta en común");
-   cmbViews.append("option").attr("value", PROGRESS).html("progreso del proyecto");
 
-   var list = editableList.create(container);
+   var list = editableList.create(pokerDetailId);
    list.entryClassName("task-entry");
 
    list.add(function(text) {
@@ -232,10 +256,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    bus.listen("show-window", function(e, window) {
       if (window == "poker") {
-         container.style("display", "block");
+         bus.send("ui-show", pokerDetailId);
          currentView = null;
       } else {
-         container.style("display", "none");
+         bus.send("ui-hide", pokerDetailId);
       }
    });
 
@@ -245,7 +269,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    bus.listen("updated-poker", function(e, newPoker) {
       poker = newPoker;
-      spnTitle.html(poker.name);
+      bus.send("ui-set-content", {
+         "div" : "poker-detail-title",
+         "html" : "<h1>Tareas de " + poker.name + "</h1>"
+      });
       if (currentView == null) {
          if (!estimations(poker.tasks)) {
             currentView = views[INDIVIDUAL];
