@@ -9,7 +9,7 @@
 	width: 90%;
 }
 
-.wiki-content textarea {
+#txtWiki {
 	width: 100%;
 	height: 100%;
 }

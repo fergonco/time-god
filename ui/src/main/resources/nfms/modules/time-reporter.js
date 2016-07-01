@@ -1,72 +1,86 @@
-define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
+define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbus, uiValues, d3) {
 
-   var task = null;
-   var keywords = [];
-   var choiceQueue = [];
+   var txt = null;
+   var currentTask = null;
+
+   bus.listen("time-report-change", function(e, value) {
+      var userMessage = "";
+      try {
+         var time = parse(value);
+         var msDifference = time.end - time.start;
+         userMessage = (msDifference / (1000 * 60 * 60)) + "h";
+      } catch (e) {
+         userMessage = e;
+      }
+      bus.send("ui-set-content", {
+         "div" : "msgTimeReporter",
+         "html" : userMessage
+      });
+   });
 
    bus.listen("report-time", function(e, task) {
+      currentTask = task;
+      var reporterId = "dedication-reporter";
       var reporter = d3.select("body").append("div")//
       .attr("id", "time-overlay")//
       .attr("class", "modal-overlay")//
       .append("div")//
-      .attr("id", "dedication-reporter");
+      .attr("id", reporterId);
 
-      var span = null;
-
-      var txt = reporter.append("input")//
-      .attr("type", "text")//
-      .on("keyup", function() {
-         try {
-            var time = parse(txt.property("value"));
-            var msDifference = time.end - time.start;
-            span.html((msDifference / (1000 * 60 * 60)) + "h");
-         } catch (e) {
-            span.html(e);
-         }
+      bus.send("ui-input-field:create", {
+         "div" : "txtTime",
+         "parentDiv" : reporterId,
+         "changeEventName" : "time-report-change"
       });
 
-      reporter.append("span")//
-      .attr("class", "span-button")//
-      .html("reportar")//
-      .on("click", function() {
-         try {
-            var time = parse(txt.property("value"));
-            var taxonomyProcessedListener = function(e, type, keywords) {
-               if (type == "time") {
-                  bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
-                  String
-                  msg = "Resumen:<ul>" //
-                     + "<li>Tarea: " + task.name//
-                     + "</li><li>Inicio: " + new Date(time.start)//
-                     + "</li><li>Fin: " + new Date(time.end)//
-                     + "</li><li>Keywords: " + keywords + "</li></ul>";
-                  var dialogOptions = {
-                     "message" : msg,
-                     "okAction" : function() {
-                        wsbus.send("report-task-time", {
-                           "taskId" : task.id,
-                           "timeStart" : time.start,
-                           "timeEnd" : time.end,
-                           "keywords" : keywords
-                        });
-                     },
-                     "closeAction" : function() {
-                        d3.select("#time-overlay").remove();
-                     }
-                  };
-                  bus.send("jsdialogs.confirm", [ dialogOptions ]);
-               }
-            };
-            bus.listen("taxonomy-processed", taxonomyProcessedListener);
-            bus.send("show-taxonomy", [ this, "time" ]);
-         } catch (e) {
-            alert(e);
-         }
+      bus.send("ui-button:create", {
+         "div" : "btnReport",
+         "parentDiv" : reporterId,
+         "text" : "Reportar",
+         "sendEventName" : "btnReport-click"
       });
 
-      span = reporter.append("span");
+      bus.send("ui-element:create", {
+         "div" : "msgTimeReporter",
+         "parentDiv" : reporterId,
+         "type" : "span"
+      });
    });
 
+   bus.listen("btnReport-click", function() {
+      try {
+         var time = parse(uiValues.get("txtTime"));
+         var taxonomyProcessedListener = function(e, type, keywords) {
+            if (type == "time") {
+               bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
+               msg = "Resumen:<ul>" //
+                  + "<li>Tarea: " + currentTask.name//
+                  + "</li><li>Inicio: " + new Date(time.start)//
+                  + "</li><li>Fin: " + new Date(time.end)//
+                  + "</li><li>Keywords: " + keywords + "</li></ul>";
+               var dialogOptions = {
+                  "message" : msg,
+                  "okAction" : function() {
+                     wsbus.send("report-task-time", {
+                        "taskId" : currentTask.id,
+                        "timeStart" : time.start,
+                        "timeEnd" : time.end,
+                        "keywords" : keywords
+                     });
+                  },
+                  "closeAction" : function() {
+                     d3.select("#time-overlay").remove();
+                  }
+               };
+               bus.send("jsdialogs.confirm", [ dialogOptions ]);
+            }
+         };
+         bus.listen("taxonomy-processed", taxonomyProcessedListener);
+         bus.send("show-taxonomy", [ d3.select("#btnReport").node(), "time" ]);
+      } catch (e) {
+         alert(e);
+      }
+   });
    function parse(text) {
       var timeRegExp = /([0-9]{1,2})[.|:]([0-9]{2})-([0-9]{1,2})[.|:]([0-9]{2})/g;
       var match = timeRegExp.exec(text);

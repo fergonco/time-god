@@ -1,11 +1,16 @@
 define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bus, wsbus, editableList) {
 
-   var container = d3.select("body").append("div").attr("id", "poker-list");
-   container.style("display", "none");
+   var pokerListId = "poker-list";
 
-   container.append("h1").html("Proyectos");
+   bus.send("ui-element:create", {
+      "type" : "div",
+      "div" : pokerListId,
+      "parentDiv" : null,
+      "html" : "<h1>Proyectos</h1>"
+   });
+   bus.send("ui-hide", pokerListId);
 
-   var list = editableList.create(container);
+   var list = editableList.create(pokerListId);
 
    list.entryClassName("poker-entry");
 
@@ -32,8 +37,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    list.postProcess(function(selection) {
       selection//
       .append("span")//
-      .attr("class", "span-button")//
-      .html("establecer keywords")//
       .on("click", function(poker) {
          var taxonomyProcessedListener = function(e, type, keywords) {
             if (type == "poker") {
@@ -48,6 +51,12 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
          bus.send("show-taxonomy", [ this, "poker" ]);
          d3.event.stopPropagation();
+      })//
+      .each(function(d, i) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "establecer keywords"
+         });
       });
 
       selection.attr("title", function(d) {
@@ -66,10 +75,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    bus.listen("show-window", function(e, window) {
       if (window == "pokers") {
-         container.style("display", "block");
+         bus.send("ui-show", pokerListId);
          wsbus.send("get-pokers");
       } else {
-         container.style("display", "none");
+         bus.send("ui-hide", pokerListId);
       }
    });
 
