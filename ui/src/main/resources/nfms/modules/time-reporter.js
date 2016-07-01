@@ -1,46 +1,55 @@
-define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
+define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbus, uiValues, d3) {
 
-   var task = null;
-   var keywords = [];
-   var choiceQueue = [];
    var txt = null;
-   var currentTask = task;
-   
+   var currentTask = null;
+
+   bus.listen("time-report-change", function(e, value) {
+      var userMessage = "";
+      try {
+         var time = parse(value);
+         var msDifference = time.end - time.start;
+         userMessage = (msDifference / (1000 * 60 * 60)) + "h";
+      } catch (e) {
+         userMessage = e;
+      }
+      bus.send("ui-set-content", {
+         "div" : "msgTimeReporter",
+         "html" : userMessage
+      });
+   });
+
    bus.listen("report-time", function(e, task) {
       currentTask = task;
+      var reporterId = "dedication-reporter";
       var reporter = d3.select("body").append("div")//
       .attr("id", "time-overlay")//
       .attr("class", "modal-overlay")//
       .append("div")//
-      .attr("id", "dedication-reporter");
+      .attr("id", reporterId);
 
-      var span = null;
-
-      txt = reporter.append("input")//
-      .attr("type", "text")//
-      .on("keyup", function() {
-         try {
-            var time = parse(txt.property("value"));
-            var msDifference = time.end - time.start;
-            span.html((msDifference / (1000 * 60 * 60)) + "h");
-         } catch (e) {
-            span.html(e);
-         }
+      bus.send("ui-input-field:create", {
+         "div" : "txtTime",
+         "parentDiv" : reporterId,
+         "changeEventName" : "time-report-change"
       });
 
       bus.send("ui-button:create", {
          "div" : "btnReport",
-         "parentDiv" : reporter.attr("id"),
+         "parentDiv" : reporterId,
          "text" : "Reportar",
          "sendEventName" : "btnReport-click"
       });
 
-      span = reporter.append("span");
+      bus.send("ui-element:create", {
+         "div" : "msgTimeReporter",
+         "parentDiv" : reporterId,
+         "type" : "span"
+      });
    });
 
    bus.listen("btnReport-click", function() {
       try {
-         var time = parse(txt.property("value"));
+         var time = parse(uiValues.get("txtTime"));
          var taxonomyProcessedListener = function(e, type, keywords) {
             if (type == "time") {
                bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
