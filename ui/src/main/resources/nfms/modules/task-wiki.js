@@ -1,36 +1,58 @@
-define([ "message-bus", "websocket-bus", "d3", "markdown" ], function(bus, wsbus, d3) {
+define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], function(bus, wsbus, d3, uiValues) {
 
    var wikiOverlayId = "wiki-overlay";
 
    var currentTaskId;
    var cancelText;
-   var txt;
-   var render;
-   var btnOk;
-   var btnCancel;
-   var btnEdit;
-   var btnClose;
 
    function setEditMode(flag) {
-      d3.select("#txtWiki").style("display", flag ? "block" : "none");
-      d3.select("#wiki-render").style("display", flag ? "none" : "block");
+      bus.send(flag ? "ui-show" : "ui-hide", "txtWiki");
+      bus.send(flag ? "ui-hide" : "ui-show", "wiki-render");
 
-      d3.select("#btnOk").style("display", flag ? "inline" : "none");
-      d3.select("#btnCancel").style("display", flag ? "inline" : "none");
-      d3.select("#btnEdit").style("display", flag ? "none" : "inline");
-      d3.select("#btnClose").style("display", flag ? "none" : "inline");
+      bus.send(flag ? "ui-show" : "ui-hide", "btnOk");
+      bus.send(flag ? "ui-show" : "ui-hide", "btnCancel");
+      bus.send(flag ? "ui-hide" : "ui-show", "btnEdit");
+      bus.send(flag ? "ui-hide" : "ui-show", "btnClose");
    }
 
    function updateWikiCallback(e, task) {
       if (task.id == currentTaskId) {
-         txt.property("value", task.wiki);
-         render.html(markdown.toHTML(task.wiki != null ? task.wiki : ""));
+         uiValues.set("txtWiki", task.wiki);
+         bus.send("ui-set-content", {
+            div : "wiki-render",
+            html : markdown.toHTML(task.wiki != null ? task.wiki : "")
+         });
       }
    }
+   bus.listen("updated-task", updateWikiCallback);
+
+   bus.listen("wikiChanged", function(e, message) {
+      wsbus.send("change-task-wiki", {
+         "taskId" : currentTaskId,
+         "wiki" : message
+      });
+   });
+   bus.listen("edit-wiki", function(e, message) {
+      setEditMode(true);
+      cancelText = uiValues.get("txtWiki");
+   });
+   bus.listen("accept-wiki", function(e, message) {
+      setEditMode(false);
+   });
+   bus.listen("cancel-wiki", function(e, message) {
+      wsbus.send("change-task-wiki", {
+         "taskId" : currentTaskId,
+         "wiki" : cancelText
+      });
+      setEditMode(false);
+   });
+   bus.listen("close-wiki", function(e, message) {
+      bus.stopListen("updated-task", updateWikiCallback);
+      d3.select("#" + wikiOverlayId).remove();
+   });
 
    bus.listen("show-task-wiki", function(e, task) {
       currentTaskId = task.id;
-      d3.select("#" + wikiOverlayId).remove();
       var container = d3.select("body").append("div")//
       .attr("id", wikiOverlayId)//
       .attr("class", "modal-overlay")//
@@ -39,17 +61,17 @@ define([ "message-bus", "websocket-bus", "d3", "markdown" ], function(bus, wsbus
       .attr("class", "wiki-content")//
       .style("display", "inline-block");
 
-      render = container.append("div")//
-      .attr("id", "wiki-render")//
-      .attr("class", "content");
+      bus.send("ui-element:create", {
+         "div" : "wiki-render",
+         "parentDiv" : "wiki-content",
+         "type" : "div",
+         "css" : "content"
+      });
 
-      txt = container.append("textarea")//
-      .attr("id", "txtWiki")//
-      .on("input", function() {
-         wsbus.send("change-task-wiki", {
-            "taskId" : task.id,
-            "wiki" : txt.property("value")
-         });
+      bus.send("ui-text-area-field:create", {
+         "div" : "txtWiki",
+         "parentDiv" : "wiki-content",
+         "changeEventName" : "wikiChanged"
       });
 
       updateWikiCallback(null, task);
@@ -60,19 +82,12 @@ define([ "message-bus", "websocket-bus", "d3", "markdown" ], function(bus, wsbus
          "text" : "Editar",
          "sendEventName" : "edit-wiki"
       });
-      bus.listen("edit-wiki", function(e, message) {
-         setEditMode(true);
-         cancelText = txt.property("value");
-      });
 
       bus.send("ui-button:create", {
          "div" : "btnOk",
          "parentDiv" : container.attr("id"),
          "text" : "Aceptar",
          "sendEventName" : "accept-wiki"
-      });
-      bus.listen("accept-wiki", function(e, message) {
-         setEditMode(false);
       });
 
       bus.send("ui-button:create", {
@@ -81,13 +96,6 @@ define([ "message-bus", "websocket-bus", "d3", "markdown" ], function(bus, wsbus
          "text" : "Cancelar",
          "sendEventName" : "cancel-wiki"
       });
-      bus.listen("cancel-wiki", function(e, message) {
-         wsbus.send("change-task-wiki", {
-            "taskId" : task.id,
-            "wiki" : cancelText
-         });
-         setEditMode(false);
-      });
 
       bus.send("ui-button:create", {
          "div" : "btnClose",
@@ -95,14 +103,9 @@ define([ "message-bus", "websocket-bus", "d3", "markdown" ], function(bus, wsbus
          "text" : "Cerrar",
          "sendEventName" : "close-wiki"
       });
-      bus.listen("close-wiki", function(e, message) {
-         bus.stopListen("updated-task", updateWikiCallback);
-         d3.select("#" + wikiOverlayId).remove();
-      });
 
       setEditMode(false);
 
-      bus.listen("updated-task", updateWikiCallback);
    });
 
 });

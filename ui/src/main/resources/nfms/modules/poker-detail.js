@@ -18,17 +18,17 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       "div" : "poker-detail-title",
       "parentDiv" : pokerDetailId
    });
-
+   bus.listen("totalCreditsUpdated", function(e, value) {
+      wsbus.send("change-poker-totalCredits", {
+         "pokerName" : poker.name,
+         "totalCredits" : value
+      });
+   });
    bus.send("ui-input-field:create", {
       "div" : "txt-project-totalCredits",
       "parentDiv" : pokerDetailId,
       "text" : "Duración del proyecto: ",
-      "changeListener" : function(value) {
-         wsbus.send("change-poker-totalCredits", {
-            "pokerName" : poker.name,
-            "totalCredits" : value
-         });
-      }
+      "changeEventName" : "totalCreditsUpdated"
    });
 
    bus.send("ui-progress:create", {
