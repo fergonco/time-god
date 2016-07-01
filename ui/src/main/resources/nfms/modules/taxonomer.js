@@ -5,9 +5,6 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
    var keywords = [];
    var choiceQueue = [];
 
-   var title;
-   var divKeywords;
-
    function initialize() {
       keywords = [];
       choiceQueue = [];
@@ -17,25 +14,40 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
       initialize();
       taxonomyType = type;
 
+      var taxonomerId = "taxonomer";
+
       var bounds = control.getBoundingClientRect();
       var container = d3.select("body").append("div")//
       .attr("id", "taxonomy-overlay")//
       .attr("class", "modal-overlay")//
       .append("div")//
-      .attr("id", "taxonomer")//
+      .attr("id", taxonomerId)//
       .style("top", bounds.bottom + "px")//
       .style("left", bounds.right + "px");
 
-      divKeywords = container.append("div");
-      title = container.append("b");
+      bus.send("ui-element:create", {
+         "div" : "taxonomy-keywords",
+         "parentDiv" : taxonomerId
+      });
+      bus.send("ui-element:create", {
+         "div" : "taxonomy-title",
+         "parentDiv" : taxonomerId,
+         "type" : "b"
+      })
 
       wsbus.send("get-taxonomy", type);
 
-      d3.select("body").on("keydown", function() {
-         if (d3.event.keyCode == 27) {
-            close();
-         }
+      bus.send("ui-key-listen", {
+         "div" : null,
+         "keydownEventName" : "escape-cancel"
       });
+
+   });
+
+   bus.listen("escape-cancel", function(e, event) {
+      if (event.keyCode == 27) {
+         close();
+      }
    });
 
    bus.listen("updated-taxonomy", function(e, t) {
@@ -44,8 +56,11 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
    });
 
    function close() {
-      d3.select("body").on("keydown", null);
       d3.select("#taxonomy-overlay").remove();
+      bus.send("ui-key-unlisten", {
+         "div" : null,
+         "keydownEventName" : "escape-cancel"
+      });
    }
 
    function next() {
@@ -58,7 +73,10 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
    }
 
    function refresh(taxonomy) {
-      title.html(taxonomy.text);
+      bus.send("ui-set-content", {
+         "div" : "taxonomy-title",
+         "html" : taxonomy.text
+      })
       if (taxonomy.type == "sequence") {
          if (taxonomy.children) {
             for (var i = taxonomy.children.length - 1; i >= 0; i--) {
@@ -125,7 +143,7 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
    }
 
    function updateKeywords() {
-      var keywordSelection = divKeywords.selectAll(".keyword").data(keywords);
+      var keywordSelection = d3.select("#taxonomy-keywords").selectAll(".keyword").data(keywords);
       keywordSelection.exit().remove();
       keywordSelection.enter().append("li");
       keywordSelection.attr("class", "keyword")//
