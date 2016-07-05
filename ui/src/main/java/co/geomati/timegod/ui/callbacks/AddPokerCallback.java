@@ -19,6 +19,7 @@ public class AddPokerCallback extends AbstractCallBack implements Callback {
 		em.getTransaction().begin();
 		em.persist(poker);
 		em.getTransaction().commit();
-		sendPokers(bus);
+
+		bus.broadcast("poker-added", GSON.toJsonTree(poker));
 	}
 }

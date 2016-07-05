@@ -25,6 +25,7 @@ public class RemoveTaskCallback extends AbstractCallBack implements Callback {
 		poker.getTasks().remove(task);
 		em.remove(task);
 		em.getTransaction().commit();
-		bus.broadcast("updated-poker", GSON.toJsonTree(task.getPoker()));
+		bus.broadcast("task-removed", GSON.toJsonTree(new TaskRemovedMessage(
+				poker.getName(), taskId)));
 	}
 }

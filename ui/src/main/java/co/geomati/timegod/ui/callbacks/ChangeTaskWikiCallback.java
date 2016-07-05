@@ -23,6 +23,7 @@ public class ChangeTaskWikiCallback extends AbstractCallBack implements
 		em.getTransaction().begin();
 		task.setWiki(updateTaskMessage.get("wiki").getAsString());
 		em.getTransaction().commit();
-		bus.broadcast("updated-task", GSON.toJsonTree(task));
+		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
+				task.getPoker().getName(), task)));
 	}
 }

@@ -12,7 +12,7 @@ public class RemoveDeveloperCallback extends AbstractCallBack implements
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
 			JsonElement payload) {
-		removeEntity(Developer.class, payload);
-		sendDevelopers(bus);
+		String name = removeEntity(Developer.class, payload);
+		bus.broadcast("developer-removed", GSON.toJsonTree(name));
 	}
 }

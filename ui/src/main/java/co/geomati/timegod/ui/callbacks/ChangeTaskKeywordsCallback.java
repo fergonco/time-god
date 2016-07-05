@@ -25,6 +25,7 @@ public class ChangeTaskKeywordsCallback extends AbstractCallBack implements
 		JsonArray array = updateTaskMessage.get("keywords").getAsJsonArray();
 		task.setKeywords(GSON.fromJson(array, String[].class));
 		em.getTransaction().commit();
-		bus.broadcast("updated-poker", GSON.toJsonTree(task.getPoker()));
+		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
+				task.getPoker().getName(), task)));
 	}
 }

@@ -26,13 +26,14 @@ public abstract class AbstractCallBack implements Callback {
 		GSON = builder.create();
 	}
 
-	<T> void removeEntity(Class<T> clazz, JsonElement payload) {
+	<T> String removeEntity(Class<T> clazz, JsonElement payload) {
 		EntityManager em = DBUtils.getEntityManager();
 		T entity = em.find(clazz, payload.getAsString());
 		em.getTransaction().begin();
 		em.remove(entity);
 		em.getTransaction().commit();
 
+		return payload.getAsString();
 	}
 
 	void sendDevelopers(WebsocketBus bus) {

@@ -23,6 +23,8 @@ public class ChangeTaskCommonCreditsCallback extends AbstractCallBack implements
 		em.getTransaction().begin();
 		task.setCommonEstimation(updateTaskMessage.get("credits").getAsInt());
 		em.getTransaction().commit();
-		bus.broadcast("updated-poker", GSON.toJsonTree(task.getPoker()));
+
+		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
+				task.getPoker().getName(), task)));
 	}
 }

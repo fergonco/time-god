@@ -20,6 +20,6 @@ public class AddDeveloperCallback extends AbstractCallBack implements Callback {
 		em.getTransaction().begin();
 		em.persist(developer);
 		em.getTransaction().commit();
-		sendDevelopers(bus);
+		bus.broadcast("developer-added", GSON.toJsonTree(developer));
 	}
 }

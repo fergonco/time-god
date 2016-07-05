@@ -36,13 +36,12 @@ define([ "message-bus", "websocket-bus", "editableList" ], function(bus, wsbus, 
    bus.listen("show-window", function(e, window) {
       if (window == "developers") {
          bus.send("ui-show", developerListId);
-         wsbus.send("get-developers");
       } else {
          bus.send("ui-hide", developerListId);
       }
    });
 
-   bus.listen("updated-developer-list", function(e, devList) {
+   bus.listen("ui-update-developer-list", function(e, devList) {
       list.refresh(devList);
    });
 });

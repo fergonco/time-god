@@ -26,7 +26,7 @@ public class ChangePokerKeywordsCallback extends AbstractCallBack implements
 		poker.setKeywords(GSON.fromJson(array, String[].class));
 		em.getTransaction().commit();
 
-		sendPokers(bus);
+		bus.broadcast("updated-poker", GSON.toJsonTree(poker));
 	}
 
 }

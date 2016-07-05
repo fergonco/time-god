@@ -30,6 +30,7 @@ public class ChangeTaskUserCreditsCallback extends AbstractCallBack implements
 		em.persist(estimation);
 		task.getEstimations().add(estimation);
 		em.getTransaction().commit();
-		bus.broadcast("updated-poker", GSON.toJsonTree(task.getPoker()));
+		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
+				task.getPoker().getName(), task)));
 	}
 }

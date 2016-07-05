@@ -27,7 +27,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    list.select(function(d) {
       bus.send("show-window", [ "poker" ]);
-      bus.send("selected-poker", d)
+      bus.send("selected-poker", d.name)
    });
 
    list.renderer(function(d) {
@@ -76,13 +76,12 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    bus.listen("show-window", function(e, window) {
       if (window == "pokers") {
          bus.send("ui-show", pokerListId);
-         wsbus.send("get-pokers");
       } else {
          bus.send("ui-hide", pokerListId);
       }
    });
 
-   bus.listen("updated-poker-list", function(e, pokerList) {
+   bus.listen("ui-update-poker-list", function(e, pokerList) {
       list.refresh(pokerList);
    });
 });

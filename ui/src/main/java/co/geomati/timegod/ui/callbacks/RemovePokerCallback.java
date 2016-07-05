@@ -11,7 +11,7 @@ public class RemovePokerCallback extends AbstractCallBack implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
 			JsonElement payload) {
-		removeEntity(Poker.class, payload);
-		sendPokers(bus);
+		String name = removeEntity(Poker.class, payload);
+		bus.broadcast("poker-removed", GSON.toJsonTree(name));
 	}
 }

@@ -2,6 +2,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
    var userName = null;
    var poker = null;
+   var pokerName = null;
    var currentView = null;
 
    var pokerDetailId = "poker-detail";
@@ -208,7 +209,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    });
 
    list.select(function(d) {
-      bus.send("show-task-wiki", [ d ]);
+      bus.send("show-task-wiki", [ d.id ]);
    });
 
    list.renderer(function(d) {
@@ -263,30 +264,35 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       }
    });
 
-   bus.listen("selected-poker", function(e, poker) {
-      wsbus.send("get-poker", poker.name);
+   bus.listen("selected-poker", function(e, newPokerName) {
+      pokerName = newPokerName;
+      bus.send("get-poker", newPokerName);
    });
 
-   bus.listen("updated-poker", function(e, newPoker) {
-      poker = newPoker;
-      bus.send("ui-set-content", {
-         "div" : "poker-detail-title",
-         "html" : "<h1>Tareas de " + poker.name + "</h1>"
-      });
-      if (currentView == null) {
-         if (!estimations(poker.tasks)) {
-            currentView = views[INDIVIDUAL];
-         } else if (!commonEstimation(poker.tasks)) {
-            currentView = views[COMMON];
-         } else {
-            currentView = views[PROGRESS];
+   bus.listen("ui-update-poker",
+      function(e, newPoker) {
+         if (pokerName != null && pokerName == newPoker.name) {
+            poker = newPoker;
+            bus.send("ui-set-content", {
+               "div" : "poker-detail-title",
+               "html" : "<h1>Tareas de " + poker.name + "</h1>"
+            });
+            if (currentView == null) {
+               if (!estimations(poker.tasks)) {
+                  currentView = views[INDIVIDUAL];
+               } else if (!commonEstimation(poker.tasks)) {
+                  currentView = views[COMMON];
+               } else {
+                  currentView = views[PROGRESS];
+               }
+            }
+            list.refresh(poker.tasks);
+            bus.send("progress-project-estimated-field-value-fill", (100 * getTotalEstimation(poker))
+               / poker.totalCredits);
+            bus.send("progress-project-real-field-value-fill", (100 * getTotalReported(poker)) / poker.totalCredits);
+            bus.send("txt-project-totalCredits-field-value-fill", poker.totalCredits);
          }
-      }
-      list.refresh(poker.tasks);
-      bus.send("progress-project-estimated-field-value-fill", (100 * getTotalEstimation(poker)) / poker.totalCredits);
-      bus.send("progress-project-real-field-value-fill", (100 * getTotalReported(poker)) / poker.totalCredits);
-      bus.send("txt-project-totalCredits-field-value-fill", poker.totalCredits);
-   });
+      });
    function getTotalEstimation(poker) {
       var total = 0;
       for (var i = 0; i < poker.tasks.length; i++) {
@@ -307,15 +313,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
 
       return total;
    }
-   bus.listen("updated-task", function(e, newTask) {
-      for (var i = 0; i < poker.tasks.length; i++) {
-         if (poker.tasks[i].id == newTask.id) {
-            poker.tasks[i] = newTask;
-            break;
-         }
-      }
-      list.refresh(poker.tasks);
-   });
+
    bus.listen("set-user", function(e, newUserName) {
       userName = newUserName;
    });

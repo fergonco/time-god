@@ -34,6 +34,6 @@ public class ReportTaskTimesCallback extends AbstractCallBack implements
 		em.persist(timeSegment);
 		task.getTimeSegments().add(timeSegment);
 		em.getTransaction().commit();
-		bus.broadcast("updated-poker", GSON.toJsonTree(task.getPoker()));
+		bus.broadcast("updated-task", GSON.toJsonTree(task));
 	}
 }

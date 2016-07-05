@@ -27,6 +27,8 @@ public class AddTaskCallback extends AbstractCallBack implements Callback {
 		poker.getTasks().add(task);
 		em.getTransaction().commit();
 
-		bus.broadcast("updated-poker", GSON.toJsonTree(task.getPoker()));
+		TaskAddedMessage taskAdded = new TaskAddedMessage(poker.getName(), task);
+
+		bus.broadcast("task-added", GSON.toJsonTree(taskAdded));
 	}
 }
