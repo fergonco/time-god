@@ -17,11 +17,27 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
 
    bus.listen("ui-update-task", function(e, task) {
       if (currentTaskId != null && currentTaskId == task.id) {
-         uiValues.set("txtWiki", task.wiki);
          bus.send("ui-set-content", {
             div : "wiki-render",
             html : markdown.toHTML(task.wiki != null ? task.wiki : "")
          });
+         if (uiValues.get("txtWiki") != task.wiki) {
+            uiValues.set("txtWiki", task.wiki);
+            cancelText = uiValues.get("txtWiki");
+
+            bus.send("ui-css", {
+               "div" : "txtWiki",
+               "property" : "background-color",
+               "value" : "red"
+            });
+            setTimeout(function() {
+               bus.send("ui-css", {
+                  "div" : "txtWiki",
+                  "property" : "background-color",
+                  "value" : ""
+               });
+            }, 1000);
+         }
       }
    });
 
@@ -33,7 +49,6 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
    });
    bus.listen("edit-wiki", function(e, message) {
       setEditMode(true);
-      cancelText = uiValues.get("txtWiki");
    });
    bus.listen("accept-wiki", function(e, message) {
       setEditMode(false);
