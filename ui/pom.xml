@@ -31,6 +31,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.fao.unredd</groupId>
 			<artifactId>core</artifactId>
 			<version>4.0.2-SNAPSHOT</version>

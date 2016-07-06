@@ -39,7 +39,8 @@ public class TaskMapping implements JsonSerializer<Task>,
 		Task t = new Task();
 		t.setName(jsonTask.get("name").getAsString());
 		JsonElement jsonWiki = jsonTask.get("wiki");
-		t.setWiki(jsonWiki.isJsonNull() ? null : jsonWiki.getAsString());
+		t.setWiki(jsonWiki == null || jsonWiki.isJsonNull() ? null : jsonWiki
+				.getAsString());
 		t.setCreationTime(jsonTask.get("creationTime").getAsLong());
 		t.setKeywords(DEFAULT_GSON.fromJson(jsonTask.get("keywords"),
 				String[].class));
