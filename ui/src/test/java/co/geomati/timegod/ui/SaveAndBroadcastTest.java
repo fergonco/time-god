@@ -4,8 +4,18 @@ import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Date;
 
 import javax.persistence.EntityManager;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -206,5 +216,31 @@ public class SaveAndBroadcastTest {
 
 	private JsonElement parse(String json) {
 		return new JsonParser().parse(json);
+	}
+
+	@Test
+	public void postTimeReport() throws ServletException, IOException,
+			CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+
+		TimeReportServlet servlet = new TimeReportServlet();
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+
+		long now = new Date().getTime();
+		Reader reader = new StringReader("{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "keywords:[\"k1\", \"k2\", \"k3\"]"//
+				+ "}");
+		when(request.getReader()).thenReturn(new BufferedReader(reader));
+
+		servlet.doPost(request, response);
+
+		verify(response).setStatus(201);
 	}
 }
