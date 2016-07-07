@@ -9,6 +9,7 @@
 
 		<class>co.geomati.timegod.jpa.Developer</class>
 		<class>co.geomati.timegod.jpa.Poker</class>
+		<class>co.geomati.timegod.jpa.Event</class>
 		<class>co.geomati.timegod.jpa.Task</class>
 		<class>co.geomati.timegod.jpa.Estimation</class>
 		<class>co.geomati.timegod.jpa.Taxonomy</class>
@@ -28,6 +29,7 @@
 
 		<class>co.geomati.timegod.jpa.Developer</class>
 		<class>co.geomati.timegod.jpa.Poker</class>
+		<class>co.geomati.timegod.jpa.Event</class>
 		<class>co.geomati.timegod.jpa.Task</class>
 		<class>co.geomati.timegod.jpa.Estimation</class>
 		<class>co.geomati.timegod.jpa.Taxonomy</class>

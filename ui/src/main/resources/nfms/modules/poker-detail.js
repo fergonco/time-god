@@ -15,7 +15,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
    bus.send("ui-hide", pokerDetailId);
 
    bus.send("ui-element:create", {
-      "type" : "span",
+      "type" : "h1",
       "div" : "poker-detail-title",
       "parentDiv" : pokerDetailId
    });
@@ -58,6 +58,12 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
       }
    });
 
+   bus.send("ui-element:create", {
+      "div" : "poker-detail-events",
+      "parentDiv" : pokerDetailId,
+      "type" : "pre"
+   });
+
    var divButtonsId = "div-buttons";
    bus.send("ui-element:create", {
       "type" : "div",
@@ -71,6 +77,28 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
       "text" : "Volver",
       "sendEventName" : "show-window",
       "sendEventMessage" : "pokers"
+   });
+
+   bus.send("ui-button:create", {
+      "div" : "poker-detail-registerEvent",
+      "parentDiv" : divButtonsId,
+      "text" : "Registrar evento",
+      "sendEventName" : "register-event"
+   });
+
+   bus.listen("register-event", function(e, message) {
+      var eventTaxonomyListener = function(e, type, keywords) {
+         if (type == "event") {
+            bus.stopListen("taxonomy-processed", eventTaxonomyListener);
+            wsbus.send("add-poker-event", {
+               "pokerName" : poker.name,
+               "timestamp" : new Date().getTime(),
+               "keywords" : keywords
+            });
+         }
+      };
+      bus.listen("taxonomy-processed", eventTaxonomyListener);
+      bus.send("show-taxonomy", [ d3.select("#poker-detail-registerEvent").node(), "event" ]);
    });
 
    bus.send("ui-button:create", {
@@ -97,8 +125,8 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
       for (var i = 0; i < poker.tasks.length; i++) {
          var task = poker.tasks[i];
          wiki += "## " + task.name + "\n";
-         wiki += "Consumido: " + Math.round((100 * getTotalTime(task)) / task.commonEstimation) + "% de " + task.commonEstimation
-            + "\n";
+         wiki += "Consumido: " + Math.round((100 * getTotalTime(task)) / task.commonEstimation) + "% de "
+            + task.commonEstimation + "\n";
          if (task.wiki) {
             var taskWiki = task.wiki;
             for (var j = 5; j > 0; j--) {
@@ -320,10 +348,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
       function(e, newPoker) {
          if (pokerName != null && pokerName == newPoker.name) {
             poker = newPoker;
+            // poker name
             bus.send("ui-set-content", {
                "div" : "poker-detail-title",
-               "html" : "<h1>Tareas de " + poker.name + "</h1>"
+               "html" : poker.name
             });
+
+            // task list
             if (currentView == null) {
                if (!estimations(poker.tasks)) {
                   currentView = views[INDIVIDUAL];
@@ -334,10 +365,24 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
                }
             }
             list.refresh(poker.tasks);
+
+            // progress bars
             bus.send("progress-project-estimated-field-value-fill", (100 * getTotalEstimation(poker))
                / poker.totalCredits);
             bus.send("progress-project-real-field-value-fill", (100 * getTotalReported(poker)) / poker.totalCredits);
             bus.send("txt-project-totalCredits-field-value-fill", poker.totalCredits);
+
+            // event list
+            var eventReport = "Eventos:\n";
+            for (var i = 0; i < poker.events.length; i++) {
+               var event = poker.events[i];
+               eventReport += new Date(event.timestamp) + "\t" + event.keywords + "\n";
+            }
+            bus.send("ui-set-content", {
+               "div" : "poker-detail-events",
+               "html" : eventReport
+            });
+
          }
       });
    function getTotalEstimation(poker) {

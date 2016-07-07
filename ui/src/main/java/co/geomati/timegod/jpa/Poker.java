@@ -15,6 +15,9 @@ public class Poker {
 	@OneToMany(mappedBy = "poker")
 	private ArrayList<Task> tasks;
 
+	@OneToMany(mappedBy = "poker")
+	private ArrayList<Event> events;
+
 	private String[] keywords;
 
 	private int totalCredits;
@@ -38,5 +41,9 @@ public class Poker {
 
 	public void setTotalCredits(int totalCredits) {
 		this.totalCredits = totalCredits;
+	}
+
+	public ArrayList<Event> getEvents() {
+		return events;
 	}
 }

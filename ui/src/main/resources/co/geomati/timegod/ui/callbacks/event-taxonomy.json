@@ -1,0 +1,30 @@
+{
+   "type" : "sequence",
+   "children" : [ {
+      "name" : "tipo_evento",
+      "text" : "Tipo de evento",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "inicio_analisis",
+         "text" : "Inicio de la fase de análisis"
+      }, {
+         "name" : "inicio_desarrollo",
+         "text" : "Inicio del desarrollo"
+      }, {
+         "name" : "entrega_resultado_evaluable",
+         "text" : "Entrega resultado evaluable"
+      }, {
+         "name" : "feedback_entrega",
+         "text" : "Feedback del cliente"
+      }, {
+         "name" : "intento_entrega_definitiva",
+         "text" : "Intento de entrega definitiva"
+      }, {
+         "name" : "inicio_puesta_produccion",
+         "text" : "Inicio puesta en producción"
+      }, {
+         "name" : "presentacion_producto",
+         "text" : "Presentación del producto"
+      } ]
+   } ]
+}
