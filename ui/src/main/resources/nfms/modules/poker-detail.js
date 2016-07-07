@@ -19,50 +19,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
       "div" : "poker-detail-title",
       "parentDiv" : pokerDetailId
    });
-   bus.listen("totalCreditsUpdated", function(e, value) {
-      wsbus.send("change-poker-totalCredits", {
-         "pokerName" : poker.name,
-         "totalCredits" : value
-      });
-   });
-   bus.send("ui-input-field:create", {
-      "div" : "txt-project-totalCredits",
-      "parentDiv" : pokerDetailId,
-      "text" : "Duración del proyecto: ",
-      "changeEventName" : "totalCreditsUpdated"
-   });
-
-   bus.send("ui-progress:create", {
-      "div" : "progress-project-estimated",
-      "parentDiv" : pokerDetailId,
-      "text" : "Total estimación de tareas: ",
-      "tooltip" : function() {
-         if (poker != null) {
-            return getTotalEstimation(poker) + " de " + poker.totalCredits;
-         } else {
-            return null;
-         }
-      }
-   });
-
-   bus.send("ui-progress:create", {
-      "div" : "progress-project-real",
-      "parentDiv" : pokerDetailId,
-      "text" : "Total consumido: ",
-      "tooltip" : function() {
-         if (poker != null) {
-            return getTotalReported(poker) + " de " + poker.totalCredits;
-         } else {
-            return null;
-         }
-      }
-   });
-
-   bus.send("ui-element:create", {
-      "div" : "poker-detail-events",
-      "parentDiv" : pokerDetailId,
-      "type" : "pre"
-   });
 
    var divButtonsId = "div-buttons";
    bus.send("ui-element:create", {
@@ -146,6 +102,51 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
          w.document.write("<pre>" + wiki + "</pre>");
       }
       w.document.close();
+   });
+
+   bus.listen("totalCreditsUpdated", function(e, value) {
+      wsbus.send("change-poker-totalCredits", {
+         "pokerName" : poker.name,
+         "totalCredits" : value
+      });
+   });
+   bus.send("ui-input-field:create", {
+      "div" : "txt-project-totalCredits",
+      "parentDiv" : pokerDetailId,
+      "text" : "Duración del proyecto: ",
+      "changeEventName" : "totalCreditsUpdated"
+   });
+
+   bus.send("ui-progress:create", {
+      "div" : "progress-project-estimated",
+      "parentDiv" : pokerDetailId,
+      "text" : "Total estimación de tareas: ",
+      "tooltip" : function() {
+         if (poker != null) {
+            return getTotalEstimation(poker) + " de " + poker.totalCredits;
+         } else {
+            return null;
+         }
+      }
+   });
+
+   bus.send("ui-progress:create", {
+      "div" : "progress-project-real",
+      "parentDiv" : pokerDetailId,
+      "text" : "Total consumido: ",
+      "tooltip" : function() {
+         if (poker != null) {
+            return getTotalReported(poker) + " de " + poker.totalCredits;
+         } else {
+            return null;
+         }
+      }
+   });
+
+   bus.send("ui-element:create", {
+      "div" : "poker-detail-events",
+      "parentDiv" : pokerDetailId,
+      "type" : "pre"
    });
 
    var INDIVIDUAL = "individual";
@@ -247,7 +248,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
 
    bus.send("ui-choice-field:create", {
       "div" : "task-view-choice",
-      "parentDiv" : divButtonsId,
+      "parentDiv" : pokerDetailId,
       "values" : [ {
          "text" : "estimación individual",
          "value" : INDIVIDUAL
