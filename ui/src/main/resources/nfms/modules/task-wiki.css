@@ -14,9 +14,15 @@
 	height: 100%;
 }
 
-.wiki-content .content {
+#wiki-title {
+	background-color: blue;
+	color: white;
+}
+
+#wiki-render {
 	height: 100%;
 	overflow-y: scroll;
 	border: 1px solid gray;
 	border-radius: 10px;
+	border: 1px solid blue;
 }

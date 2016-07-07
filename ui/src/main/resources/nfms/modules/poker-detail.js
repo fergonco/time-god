@@ -1,4 +1,4 @@
-define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bus, wsbus, editableList) {
+define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], function(d3, bus, wsbus, editableList) {
 
    var userName = null;
    var poker = null;
@@ -71,6 +71,53 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
       "text" : "Volver",
       "sendEventName" : "show-window",
       "sendEventMessage" : "pokers"
+   });
+
+   bus.send("ui-button:create", {
+      "div" : "poker-detail-htmlReport",
+      "parentDiv" : divButtonsId,
+      "text" : "Informe HTML",
+      "sendEventName" : "show-report",
+      "sendEventMessage" : "html"
+   });
+
+   bus.send("ui-button:create", {
+      "div" : "poker-detail-markupReport",
+      "parentDiv" : divButtonsId,
+      "text" : "Informe Markup",
+      "sendEventName" : "show-report",
+      "sendEventMessage" : "markup"
+   });
+
+   bus.listen("show-report", function(e, message) {
+      var wiki = "# " + poker.name + "\n";
+      wiki += "Consumido: " + Math.round((100 * getTotalReported(poker)) / poker.totalCredits) + "% de "
+         + poker.totalCredits + "\n";
+
+      for (var i = 0; i < poker.tasks.length; i++) {
+         var task = poker.tasks[i];
+         wiki += "## " + task.name + "\n";
+         wiki += "Consumido: " + Math.round((100 * getTotalTime(task)) / task.commonEstimation) + "% de " + task.commonEstimation
+            + "\n";
+         if (task.wiki) {
+            var taskWiki = task.wiki;
+            for (var j = 5; j > 0; j--) {
+               var pattern = "#".repeat(j);
+               taskWiki = taskWiki.replace(new RegExp(pattern, "g"), "##" + pattern);
+            }
+            wiki += taskWiki + "\n";
+         }
+      }
+
+      var w = window.open();
+      w.document.open();
+      if (message == "html") {
+         w.document.write("<html><head><link rel=\"stylesheet\" href=\"modules/poker-detail-report.css\"></head><body>"
+            + markdown.toHTML(wiki) + "</body></html>");
+      } else {
+         w.document.write("<pre>" + wiki + "</pre>");
+      }
+      w.document.close();
    });
 
    var INDIVIDUAL = "individual";

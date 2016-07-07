@@ -21,6 +21,10 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
             div : "wiki-render",
             html : markdown.toHTML(task.wiki != null ? task.wiki : "")
          });
+         bus.send("ui-set-content", {
+            div : "wiki-title",
+            html : task.name
+         });
          if (uiValues.get("txtWiki") != task.wiki) {
             uiValues.set("txtWiki", task.wiki);
             cancelText = uiValues.get("txtWiki");
@@ -74,12 +78,17 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
       .attr("id", "wiki-content")//
       .attr("class", "wiki-content")//
       .style("display", "inline-block");
+      
+      bus.send("ui-element:create", {
+         "div" : "wiki-title",
+         "parentDiv" : "wiki-content",
+         "type" : "h1"
+      });
 
       bus.send("ui-element:create", {
          "div" : "wiki-render",
          "parentDiv" : "wiki-content",
-         "type" : "div",
-         "css" : "content"
+         "type" : "div"
       });
 
       bus.send("ui-text-area-field:create", {
