@@ -5,6 +5,8 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
    var currentTaskId;
    var cancelText;
 
+   var timerId = null;
+
    function setEditMode(flag) {
       bus.send(flag ? "ui-show" : "ui-hide", "txtWiki");
       bus.send(flag ? "ui-hide" : "ui-show", "wiki-render");
@@ -45,12 +47,33 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
       }
    });
 
-   bus.listen("wikiChanged", function(e, message) {
+   bus.listen("wikiChangeDone", function(e, message) {
       wsbus.send("change-task-wiki", {
          "taskId" : currentTaskId,
          "wiki" : message
       });
+      bus.send("ui-css", {
+         "div" : "wiki-title",
+         "property" : "background-color",
+         "value" : "blue"
+      });
    });
+
+   bus.listen("wikiChanged", function(e, message) {
+      bus.send("ui-css", {
+         "div" : "wiki-title",
+         "property" : "background-color",
+         "value" : "red"
+      });
+      if (timerId != null) {
+         window.clearInterval(timerId);
+      }
+      timerId = window.setTimeout(function() {
+         bus.send("wikiChangeDone", message);
+      }, 2000);
+
+   });
+
    bus.listen("edit-wiki", function(e, message) {
       setEditMode(true);
    });
@@ -78,13 +101,13 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
       .attr("id", "wiki-content")//
       .attr("class", "wiki-content")//
       .style("display", "inline-block");
-      
+
       bus.send("ui-element:create", {
          "div" : "wiki-title",
          "parentDiv" : "wiki-content",
          "type" : "h1"
       });
-
+      
       bus.send("ui-element:create", {
          "div" : "wiki-render",
          "parentDiv" : "wiki-content",

@@ -11,7 +11,7 @@
 
 #txtWiki {
 	width: 100%;
-	height: 100%;
+	height: 80%;
 }
 
 #wiki-title {
@@ -20,7 +20,7 @@
 }
 
 #wiki-render {
-	height: 100%;
+	height: 80%;
 	overflow-y: scroll;
 	border: 1px solid gray;
 	border-radius: 10px;
