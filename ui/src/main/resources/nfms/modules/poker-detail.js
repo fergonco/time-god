@@ -82,7 +82,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
          var task = poker.tasks[i];
          wiki += "## " + task.name + "\n";
          wiki += "Consumido: " + Math.round((100 * getTotalTime(task)) / task.commonEstimation) + "% de "
-            + task.commonEstimation + "\n";
+            + task.commonEstimation + "\n\n";
          if (task.wiki) {
             var taskWiki = task.wiki;
             for (var j = 5; j > 0; j--) {
