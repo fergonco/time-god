@@ -3,6 +3,7 @@ package co.geomati.timegod.jpa;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class TimeSegment {
@@ -15,6 +16,9 @@ public class TimeSegment {
 	private long end;
 	private String[] keywords;
 
+	@ManyToOne
+	private Developer developer;
+
 	public void setStart(long start) {
 		this.start = start;
 	}
@@ -26,4 +30,9 @@ public class TimeSegment {
 	public void setKeywords(String[] keywords) {
 		this.keywords = keywords;
 	}
+
+	public void setDeveloper(Developer developer) {
+		this.developer = developer;
+	}
+
 }

@@ -46,7 +46,8 @@ define([ "message-bus" ], function(bus) {
                   "start" : timeSegment.start,
                   "end" : timeSegment.end,
                   "task" : task,
-                  "poker" : poker
+                  "poker" : poker,
+                  "developer" : timeSegment.developer
                });
             }
          }
@@ -74,6 +75,7 @@ define([ "message-bus" ], function(bus) {
          wiki += format(start.getHours()) + "." + format(start.getMinutes());
          wiki += " - ";
          wiki += format(end.getHours()) + "." + format(end.getMinutes());
+         wiki += "\t" + timeSegments[i].developer.name;
          wiki += "\t" + timeSegments[i].poker.name;
          wiki += "\t" + timeSegments[i].task.name;
          wiki += "\n";

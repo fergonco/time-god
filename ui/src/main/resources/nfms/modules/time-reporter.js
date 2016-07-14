@@ -2,7 +2,12 @@ define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbu
 
    var txt = null;
    var currentTask = null;
+   var developerName = null;
 
+   bus.listen("set-user", function(e, userName) {
+      developerName = userName;
+   });
+   
    bus.listen("time-report-change", function(e, value) {
       var userMessage = "";
       try {
@@ -65,7 +70,8 @@ define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbu
                         "taskId" : currentTask.id,
                         "timeStart" : time.start,
                         "timeEnd" : time.end,
-                        "keywords" : keywords
+                        "keywords" : keywords,
+                        "developerName" : developerName
                      });
                   },
                   "closeAction" : function() {
