@@ -1,14 +1,16 @@
-define([ "message-bus" ], function(bus) {
+define([ "message-bus", "ui-values" ], function(bus, uiValues) {
+
+   var dlgAskPokersId = "dlg-ask-pokers";
 
    bus.listen("modules-loaded", function() {
       bus.send("show-window", [ "developers" ]);
 
-      bus.send("ui-element:create", [ {
+      bus.send("ui-element:create", {
          "div" : "lblUserName",
          "parentDiv" : null,
          "type" : "div",
          "html" : "No identificado"
-      } ]);
+      });
 
       bus.listen("set-user", function(e, userName) {
          bus.send("ui-set-content", [ {
@@ -45,10 +47,58 @@ define([ "message-bus" ], function(bus) {
       return ret;
    }
 
+   bus.listen("dlg-ask-pokers-cancel", function(e, message) {
+      bus.send("ui-dialog:close", dlgAskPokersId);
+   });
+
    bus.listen("show-time-report", function(e, message) {
-      var timeSegments = [];
+      bus.send("ui-dialog:create", {
+         div : dlgAskPokersId,
+         parentDiv : null,
+         modal : true
+      });
+      bus.send("ui-element:create", {
+         "parentDiv" : dlgAskPokersId,
+         "type" : "div",
+         "html" : "Selecciona los proyectos que quieres en el informe"
+      });
       for (var i = 0; i < pokers.length; i++) {
          var poker = pokers[i];
+         bus.send("ui-input-field:create", {
+            "div" : "chkPoker" + poker.name,
+            "parentDiv" : dlgAskPokersId,
+            "type" : "checkbox",
+            "text" : poker.name
+         });
+      }
+
+      bus.send("ui-button:create", {
+         "div" : "btnReportPokers",
+         "parentDiv" : dlgAskPokersId,
+         "text" : "Generar informe",
+         "sendEventName" : "show-time-report-for-pokers"
+      });
+      bus.send("ui-button:create", {
+         "div" : "btnCancelReport",
+         "parentDiv" : dlgAskPokersId,
+         "text" : "Cancelar",
+         "sendEventName" : "dlg-ask-pokers-cancel"
+      });
+   });
+
+   bus.listen("show-time-report-for-pokers", function(e) {
+      var selectedPokers = [];
+      for (var i = 0; i < pokers.length; i++) {
+         var poker = pokers[i];
+         if (uiValues.get("chkPoker" + poker.name)) {
+            selectedPokers.push(poker);
+         }
+      }
+      bus.send("ui-dialog:close", dlgAskPokersId);
+      
+      var timeSegments = [];
+      for (var i = 0; i < selectedPokers.length; i++) {
+         var poker = selectedPokers[i];
          for (var j = 0; j < poker.tasks.length; j++) {
             var task = poker.tasks[j];
             for (var k = 0; k < task.timeSegments.length; k++) {
