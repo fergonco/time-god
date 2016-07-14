@@ -58,6 +58,7 @@ public class SaveAndBroadcastTest {
 		manager.getTransaction().begin();
 		manager.createQuery("DELETE FROM Task").executeUpdate();
 		manager.createQuery("DELETE FROM Estimation").executeUpdate();
+		manager.createQuery("DELETE FROM TimeSegment").executeUpdate();
 		manager.createQuery("DELETE FROM Developer").executeUpdate();
 		manager.createQuery("DELETE FROM Poker").executeUpdate();
 		manager.getTransaction().commit();
@@ -235,6 +236,7 @@ public class SaveAndBroadcastTest {
 				+ "taskId:" + taskId + ","//
 				+ "timeStart: " + (now - 1000) + ","//
 				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
 				+ "keywords:[\"k1\", \"k2\", \"k3\"]"//
 				+ "}");
 		when(request.getReader()).thenReturn(new BufferedReader(reader));
