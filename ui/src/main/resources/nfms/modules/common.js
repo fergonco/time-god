@@ -70,6 +70,7 @@ define([ "message-bus", "ui-values" ], function(bus, uiValues) {
             "type" : "checkbox",
             "text" : poker.name
          });
+         uiValues.set("chkPoker" + poker.name, true);
       }
 
       bus.send("ui-button:create", {
