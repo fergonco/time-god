@@ -4,3 +4,7 @@
 	left: 40%;
 	top: 40%;
 }
+
+#divDay > div {
+    display: inline;
+}

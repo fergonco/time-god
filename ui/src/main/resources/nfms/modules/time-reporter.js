@@ -1,26 +1,50 @@
 define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbus, uiValues, d3) {
 
+   var weekdayNames = [ "Domingo LOL", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado LOL" ];
+
    var txt = null;
    var currentTask = null;
    var developerName = null;
 
+   var currentDate = null;
+   var currentTime = null;
+
    bus.listen("set-user", function(e, userName) {
       developerName = userName;
    });
-   
-   bus.listen("time-report-change", function(e, value) {
+
+   function dayInc(sign) {
+      currentDate = new Date(currentDate.getTime() + sign * 24 * 60 * 60 * 1000);
+      var day = currentDate.getDate() + "." + (currentDate.getMonth() + 1) + "." + currentDate.getFullYear();
+      uiValues.set("txtDay", day);
+      currentTime = parseTime();
+      refreshUserMessage();
+   }
+   function refreshUserMessage() {
       var userMessage = "";
-      try {
-         var time = parse(value);
-         var msDifference = time.end - time.start;
+      if (currentTime != null) {
+         var msDifference = currentTime.end - currentTime.start;
          userMessage = (msDifference / (1000 * 60 * 60)) + "h";
-      } catch (e) {
-         userMessage = e;
+      } else {
+         userMessage = "Hora no válida. Debe ser: hh.mm-hh.mm";
       }
+      userMessage = weekdayNames[currentDate.getDay()] + "," + userMessage;
+
       bus.send("ui-set-content", {
          "div" : "msgTimeReporter",
          "html" : userMessage
       });
+   }
+   bus.listen("time-report-previousDay", function(e, value) {
+      dayInc(-1);
+   });
+
+   bus.listen("time-report-nextDay", function(e, value) {
+      dayInc(1);
+   });
+   bus.listen("time-report-change", function(e, value) {
+      currentTime = parseTime();
+      refreshUserMessage();
    });
 
    bus.listen("report-time", function(e, task) {
@@ -35,7 +59,36 @@ define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbu
       bus.send("ui-input-field:create", {
          "div" : "txtTime",
          "parentDiv" : reporterId,
+         "text" : "Horario: ",
          "changeEventName" : "time-report-change"
+      });
+
+      var divDayId = "divDay";
+      bus.send("ui-element:create", {
+         "div" : divDayId,
+         "parentDiv" : reporterId,
+         "type" : "div"
+      });
+
+      bus.send("ui-input-field:create", {
+         "div" : "txtDay",
+         "parentDiv" : divDayId,
+         "text" : "Fecha: "
+      });
+      bus.send("ui-attr", {
+         "div" : "txtDay",
+         "attribute" : "readonly",
+         "value" : true
+      });
+      bus.send("ui-button:create", {
+         "parentDiv" : divDayId,
+         "text" : "<",
+         "sendEventName" : "time-report-previousDay"
+      });
+      bus.send("ui-button:create", {
+         "parentDiv" : divDayId,
+         "text" : ">",
+         "sendEventName" : "time-report-nextDay"
       });
 
       bus.send("ui-button:create", {
@@ -50,11 +103,19 @@ define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbu
          "parentDiv" : reporterId,
          "type" : "span"
       });
+
+      currentDate = new Date();
+      dayInc(0);
+
+      var now = new Date();
+      uiValues.set("txtTime", now.getHours() + "." + now.getMinutes() + "-" + (now.getHours() + 1) + "."
+         + now.getMinutes());
+      bus.send("time-report-change");
    });
 
    bus.listen("btnReport-click", function() {
       try {
-         var time = parse(uiValues.get("txtTime"));
+         var time = parseTime();
          var taxonomyProcessedListener = function(e, type, keywords) {
             if (type == "time") {
                bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
@@ -87,29 +148,24 @@ define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbu
          alert(e);
       }
    });
-   function parse(text) {
+   function parseTime() {
+      var text = uiValues.get("txtTime");
       var timeRegExp = /([0-9]{1,2})[.|:]([0-9]{2})-([0-9]{1,2})[.|:]([0-9]{2})/g;
       var match = timeRegExp.exec(text);
       if (match != null && match.length == 5) {
          var start = getTime(match[1], match[2]);
          var end = getTime(match[3], match[4]);
-         var now = new Date().getTime();
-         if (start > now || end > now) {
-            var dayMillis = 1000 * 60 * 60 * 24;
-            start -= dayMillis;
-            end -= dayMillis;
-         }
          return {
             "start" : start,
             "end" : end
          }
       } else {
-         throw "Error de formato. Debe ser hh.mm-hh.mm";
+         return null;
       }
    }
 
    function getTime(hours, minutes) {
-      var date = new Date();
+      var date = new Date(currentDate.getTime());
       date.setHours(toInt(hours));
       date.setMinutes(toInt(minutes));
       return date.getTime();
