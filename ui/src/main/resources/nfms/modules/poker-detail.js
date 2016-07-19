@@ -307,6 +307,30 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
          return ret + " | creationDate: " + new Date(t.creationTime);
       });
 
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Renombrar",
+            "sendEventName" : "rename-task",
+            "sendEventMessage" : d
+         });
+      });
+   });
+
+   bus.listen("rename-task", function(e, task) {
+      var dialogOptions = {
+         "message" : "Introduce el nuevo nombre de la tarea",
+         "okAction" : function(value) {
+            wsbus.send("change-task-name", {
+               "taskId" : task.id,
+               "name" : value
+            });
+         },
+         "initialValue" : task.name
+      };
+      bus.send("jsdialogs.question", [ dialogOptions ]);
    });
 
    function estimations(tasks) {
