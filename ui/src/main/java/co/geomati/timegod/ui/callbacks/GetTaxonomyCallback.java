@@ -16,6 +16,7 @@ import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 public class GetTaxonomyCallback extends AbstractCallBack implements Callback {
 
@@ -43,8 +44,14 @@ public class GetTaxonomyCallback extends AbstractCallBack implements Callback {
 			}
 		}
 
-		bus.broadcast("updated-taxonomy",
-				new JsonParser().parse(taxonomy.getContent()));
+		try {
+			caller.send("updated-taxonomy",
+					new JsonParser().parse(taxonomy.getContent()));
+		} catch (JsonSyntaxException e) {
+			throw new CallbackException("Cannot send taxonomy", e);
+		} catch (IOException e) {
+			throw new CallbackException("Cannot send taxonomy", e);
+		}
 
 	}
 }
