@@ -18,44 +18,60 @@ import co.geomati.timegod.ui.callbacks.GetDevelopersCallback;
 import co.geomati.timegod.ui.callbacks.GetPokerCallback;
 import co.geomati.timegod.ui.callbacks.GetPokersCallback;
 import co.geomati.timegod.ui.callbacks.GetTaxonomyCallback;
+import co.geomati.timegod.ui.callbacks.LoggingCallback;
 import co.geomati.timegod.ui.callbacks.RemoveDeveloperCallback;
 import co.geomati.timegod.ui.callbacks.RemovePokerCallback;
 import co.geomati.timegod.ui.callbacks.RemoveTaskCallback;
 import co.geomati.timegod.ui.callbacks.ReportTaskTimesCallback;
 import co.geomati.timegod.ui.callbacks.SetPokerEventCallback;
+import co.geomati.websocketBus.Callback;
 import co.geomati.websocketBus.WebsocketBus;
 
 @WebListener
 public class SaveAndBroadcast implements ServletContextListener {
 
+	private Callback loggingCallback = new LoggingCallback();
+
 	public void contextInitialized(ServletContextEvent sce) {
 		WebsocketBus bus = WebsocketBus.INSTANCE;
+
 		bus.addListener("add-developer", new AddDeveloperCallback());
 		bus.addListener("remove-developer", new RemoveDeveloperCallback());
-		bus.addListener("add-poker", new AddPokerCallback());
-		bus.addListener("change-poker-keywords",
+		addBusLoggedListener(bus, "add-poker", new AddPokerCallback());
+		addBusLoggedListener(bus, "change-poker-keywords",
 				new ChangePokerKeywordsCallback());
-		bus.addListener("add-poker-event", new SetPokerEventCallback());
-		bus.addListener("change-poker-totalCredits",
+		addBusLoggedListener(bus, "add-poker-event",
+				new SetPokerEventCallback());
+		addBusLoggedListener(bus, "change-poker-totalCredits",
 				new ChangePokerTotalCreditsCallback());
-		bus.addListener("remove-poker", new RemovePokerCallback());
-		bus.addListener("add-task-to-poker", new AddTaskCallback());
-		bus.addListener("remove-task", new RemoveTaskCallback());
-		bus.addListener("change-task-name", new ChangeTaskNameCallback());
-		bus.addListener("change-task-user-credits",
+		addBusLoggedListener(bus, "remove-poker", new RemovePokerCallback());
+		addBusLoggedListener(bus, "add-task-to-poker", new AddTaskCallback());
+		addBusLoggedListener(bus, "remove-task", new RemoveTaskCallback());
+		addBusLoggedListener(bus, "change-task-name",
+				new ChangeTaskNameCallback());
+		addBusLoggedListener(bus, "change-task-user-credits",
 				new ChangeTaskUserCreditsCallback());
-		bus.addListener("change-task-common-credits",
+		addBusLoggedListener(bus, "change-task-common-credits",
 				new ChangeTaskCommonCreditsCallback());
-		bus.addListener("change-task-wiki", new ChangeTaskWikiCallback());
-		bus.addListener("change-task-keywords",
+		addBusLoggedListener(bus, "change-task-wiki",
+				new ChangeTaskWikiCallback());
+		addBusLoggedListener(bus, "change-task-keywords",
 				new ChangeTaskKeywordsCallback());
-		bus.addListener("report-task-time", new ReportTaskTimesCallback());
+		addBusLoggedListener(bus, ReportTaskTimesCallback.EVENT_NAME,
+				new ReportTaskTimesCallback());
+
 		bus.addListener("get-developers", new GetDevelopersCallback());
 		bus.addListener("get-pokers", new GetPokersCallback());
 		bus.addListener("get-poker", new GetPokerCallback());
 
 		bus.addListener("get-taxonomy", new GetTaxonomyCallback());
 
+	}
+
+	private void addBusLoggedListener(WebsocketBus bus, String eventName,
+			Callback callback) {
+		bus.addListener(eventName, callback);
+		bus.addListener(eventName, loggingCallback);
 	}
 
 	public void contextDestroyed(ServletContextEvent sce) {

@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 public class RemoveTaskCallback extends AbstractCallBack implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject removeTaskMessage = payload.getAsJsonObject();
 		long taskId = removeTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();

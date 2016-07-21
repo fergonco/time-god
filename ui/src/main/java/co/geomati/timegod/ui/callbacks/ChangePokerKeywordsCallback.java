@@ -16,7 +16,7 @@ public class ChangePokerKeywordsCallback extends AbstractCallBack implements
 		Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		String pokerName = updateTaskMessage.get("pokerName").getAsString();
 		EntityManager em = DBUtils.getEntityManager();

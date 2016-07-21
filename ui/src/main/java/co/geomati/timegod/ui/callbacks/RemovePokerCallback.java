@@ -6,12 +6,14 @@ import co.geomati.websocketBus.Caller;
 import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class RemovePokerCallback extends AbstractCallBack implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
-		String name = removeEntity(Poker.class, payload);
+			String eventName, JsonElement payload) {
+		JsonObject payloadObj = (JsonObject) payload;
+		String name = removeEntity(Poker.class, payloadObj.get("pokerName"));
 		bus.broadcast("poker-removed", GSON.toJsonTree(name));
 	}
 }

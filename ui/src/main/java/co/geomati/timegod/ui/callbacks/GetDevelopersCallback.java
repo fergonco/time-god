@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
 public class GetDevelopersCallback extends AbstractCallBack implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		sendDevelopers(bus);
 	}
 }

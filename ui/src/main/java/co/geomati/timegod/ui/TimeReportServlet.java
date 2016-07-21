@@ -32,7 +32,8 @@ public class TimeReportServlet extends HttpServlet {
 		try {
 			payload = new JsonParser().parse(json);
 			new ReportTaskTimesCallback().messageReceived(null,
-					WebsocketBus.INSTANCE, payload);
+					WebsocketBus.INSTANCE, ReportTaskTimesCallback.EVENT_NAME,
+					payload);
 			resp.setStatus(201);
 		} catch (JsonSyntaxException e) {
 			resp.sendError(400);

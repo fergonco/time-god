@@ -47,6 +47,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
          if (type == "event") {
             bus.stopListen("taxonomy-processed", eventTaxonomyListener);
             wsbus.send("add-poker-event", {
+               "developerName" : userName,
                "pokerName" : poker.name,
                "timestamp" : new Date().getTime(),
                "keywords" : keywords
@@ -106,6 +107,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
 
    bus.listen("totalCreditsUpdated", function(e, value) {
       wsbus.send("change-poker-totalCredits", {
+         "developerName" : userName,
          "pokerName" : poker.name,
          "totalCredits" : value
       });
@@ -164,7 +166,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
          d3.event.stopPropagation();
       })//
       .on("change", function(task) {
-         bus.send("change-task-user-credits", [ userName, task.id, this.value ]);
+         wsbus.send("change-task-user-credits", {
+            "userName" : userName,
+            "taskId" : task.id,
+            "credits" : this.value,
+            "developerName" : userName
+         });
+
       });
       selection//
       .append("span")//
@@ -197,14 +205,20 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
                bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
                wsbus.send("change-task-keywords", {
                   "taskId" : task.id,
-                  "keywords" : keywords
+                  "keywords" : keywords,
+                  "developerName" : userName
                });
             }
          };
          bus.listen("taxonomy-processed", taxonomyProcessedListener);
 
          bus.send("show-taxonomy", [ this, COMMON ]);
-         bus.send("change-task-common-credits", [ task.id, this.value ]);
+         wsbus.send("change-task-common-credits", {
+            "taskId" : task.id,
+            "credits" : this.value,
+            "developerName" : userName
+         });
+
       });
       selection//
       .append("span")//
@@ -271,17 +285,24 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
    list.entryClassName("task-entry");
 
    list.add(function(text) {
-      bus.send("add-task-to-poker", [ poker.name, {
-         "name" : text,
-         "estimations" : {},
-         "wiki" : null,
-         "creationTime" : new Date().getTime(),
-         "commonEstimation" : null
-      } ]);
+      wsbus.send("add-task-to-poker", {
+         "pokerName" : poker.name,
+         "developerName" : userName,
+         "task" : {
+            "name" : text,
+            "estimations" : {},
+            "wiki" : null,
+            "creationTime" : new Date().getTime(),
+            "commonEstimation" : null
+         }
+      });
    });
 
    list.remove(function(task) {
-      bus.send("remove-task", [ task.id ]);
+      wsbus.send("remove-task", {
+         "taskId" : task.id,
+         "developerName" : userName
+      });
    });
 
    list.select(function(d) {
@@ -325,7 +346,8 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
          "okAction" : function(value) {
             wsbus.send("change-task-name", {
                "taskId" : task.id,
-               "name" : value
+               "name" : value,
+               "developerName" : userName
             });
          },
          "initialValue" : task.name

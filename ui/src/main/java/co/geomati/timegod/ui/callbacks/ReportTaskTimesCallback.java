@@ -16,8 +16,10 @@ import com.google.gson.JsonObject;
 public class ReportTaskTimesCallback extends AbstractCallBack implements
 		Callback {
 
+	public static final String EVENT_NAME = "report-task-time";
+
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();

@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 public class AddTaskCallback extends AbstractCallBack implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject addTaskMessage = payload.getAsJsonObject();
 		Task task = GSON.fromJson(addTaskMessage.get("task"), Task.class);
 		String pokerName = addTaskMessage.get("pokerName").getAsString();

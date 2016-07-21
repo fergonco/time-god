@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 public class AddPokerCallback extends AbstractCallBack implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		Poker poker = GSON.fromJson(payload.getAsJsonObject(), Poker.class);
 		EntityManager em = DBUtils.getEntityManager();
 		em.getTransaction().begin();

@@ -15,7 +15,7 @@ public class ChangeTaskNameCallback extends AbstractCallBack implements
 		Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();

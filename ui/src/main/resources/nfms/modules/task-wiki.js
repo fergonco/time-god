@@ -4,6 +4,7 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
 
    var currentTaskId;
    var cancelText;
+   var userName = null;
 
    var timerId = null;
 
@@ -50,7 +51,8 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
    bus.listen("wikiChangeDone", function(e, message) {
       wsbus.send("change-task-wiki", {
          "taskId" : currentTaskId,
-         "wiki" : message
+         "wiki" : message,
+         "developerName" : userName
       });
       bus.send("ui-css", {
          "div" : "wiki-title",
@@ -83,7 +85,8 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
    bus.listen("cancel-wiki", function(e, message) {
       wsbus.send("change-task-wiki", {
          "taskId" : currentTaskId,
-         "wiki" : cancelText
+         "wiki" : cancelText,
+         "developerName" : userName
       });
       setEditMode(false);
    });
@@ -107,7 +110,7 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
          "parentDiv" : "wiki-content",
          "type" : "h1"
       });
-      
+
       bus.send("ui-element:create", {
          "div" : "wiki-render",
          "parentDiv" : "wiki-content",
@@ -151,6 +154,10 @@ define([ "message-bus", "websocket-bus", "d3", "ui-values", "markdown" ], functi
       setEditMode(false);
 
       bus.send("get-task", taskId);
+   });
+
+   bus.listen("set-user", function(e, newUserName) {
+      userName = newUserName;
    });
 
 });
