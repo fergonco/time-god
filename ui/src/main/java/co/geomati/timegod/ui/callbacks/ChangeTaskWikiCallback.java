@@ -1,6 +1,13 @@
 package co.geomati.timegod.ui.callbacks;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import javax.persistence.EntityManager;
+
+import org.apache.commons.lang.StringUtils;
 
 import co.geomati.timegod.jpa.Task;
 import co.geomati.timegod.ui.DBUtils;
@@ -10,6 +17,9 @@ import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import difflib.DiffUtils;
+import difflib.Patch;
 
 public class ChangeTaskWikiCallback extends AbstractLoggingCallback implements
 		Callback, LoggingCallback {
@@ -44,8 +54,7 @@ public class ChangeTaskWikiCallback extends AbstractLoggingCallback implements
 	public class Memento {
 		private long taskId;
 		private String taskName;
-		private String oldWiki;
-		private String newWiki;
+		private String diff;
 
 		public Memento() {
 		}
@@ -55,13 +64,25 @@ public class ChangeTaskWikiCallback extends AbstractLoggingCallback implements
 			super();
 			this.taskId = taskId;
 			this.taskName = taskName;
-			this.oldWiki = oldWiki;
-			this.newWiki = newWiki;
+			ArrayList<String> oldWikiLines = toLines(oldWiki);
+			ArrayList<String> newWikiLines = toLines(newWiki);
+			Patch<String> patch = DiffUtils.diff(oldWikiLines, newWikiLines);
+			List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(
+					"previous", "new", oldWikiLines, patch, 10);
+			diff = StringUtils.join(unifiedDiff, "\n");
+		}
+
+		private ArrayList<String> toLines(String oldWiki) {
+			String oldWiki2 = oldWiki;
+			ArrayList<String> oldWikiLines = new ArrayList<String>();
+			Collections.addAll(oldWikiLines,
+					oldWiki2.split(Pattern.quote("\n")));
+			return oldWikiLines;
 		}
 
 		@Override
 		public String toString() {
-			return "Se cambió la wiki de " + taskName + " a\n" + newWiki;
+			return "Se cambió la wiki de " + taskName + " a\n" + diff;
 		}
 	}
 
