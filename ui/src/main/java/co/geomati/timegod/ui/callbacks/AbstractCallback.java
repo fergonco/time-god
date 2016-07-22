@@ -17,7 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
-public abstract class AbstractCallBack implements Callback {
+public abstract class AbstractCallback implements Callback {
 
 	public static Gson GSON;
 	static {

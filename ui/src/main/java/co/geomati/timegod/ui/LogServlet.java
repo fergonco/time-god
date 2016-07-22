@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -15,6 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import co.geomati.timegod.jpa.LogEvent;
+import co.geomati.timegod.ui.callbacks.LoggingCallback;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @WebServlet("/log")
 public class LogServlet extends HttpServlet {
@@ -40,6 +45,10 @@ public class LogServlet extends HttpServlet {
 		TypedQuery<LogEvent> query = em.createQuery(sql, LogEvent.class);
 		List<LogEvent> list = query.getResultList();
 
+		@SuppressWarnings("unchecked")
+		HashMap<String, LoggingCallback> loggingCallbackRegistry = (HashMap<String, LoggingCallback>) req
+				.getServletContext().getAttribute("logging-call-back-registry");
+
 		resp.setContentType("text/plain");
 		PrintWriter writer = resp.getWriter();
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
@@ -51,8 +60,14 @@ public class LogServlet extends HttpServlet {
 			builder.append(logEvent.getDeveloper().getName());
 			builder.append(" - ");
 			builder.append(logEvent.getEventName());
-			writer.println(builder.toString());
-			writer.println(logEvent.getPayload());
+			builder.append(" ");
+			writer.print(builder.toString());
+
+			JsonObject jsonObject = (JsonObject) new JsonParser()
+					.parse(logEvent.getPayload());
+			LoggingCallback loggingCallback = loggingCallbackRegistry
+					.get(logEvent.getEventName());
+			writer.println(loggingCallback.eventToString(jsonObject));
 			writer.println();
 		}
 	}

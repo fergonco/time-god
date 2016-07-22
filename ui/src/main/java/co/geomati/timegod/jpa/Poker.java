@@ -46,4 +46,12 @@ public class Poker {
 	public ArrayList<Event> getEvents() {
 		return events;
 	}
+
+	public String[] getKeywords() {
+		return keywords;
+	}
+
+	public int getTotalCredits() {
+		return totalCredits;
+	}
 }

@@ -18,7 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-public class GetTaxonomyCallback extends AbstractCallBack implements Callback {
+public class GetTaxonomyCallback extends AbstractCallback implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
 			String eventName, JsonElement payload) throws CallbackException {

@@ -7,7 +7,7 @@ import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
 
-public class RemoveDeveloperCallback extends AbstractCallBack implements
+public class RemoveDeveloperCallback extends AbstractCallback implements
 		Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,

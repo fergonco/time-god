@@ -1,5 +1,7 @@
 package co.geomati.timegod.ui;
 
+import java.util.HashMap;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -24,54 +26,40 @@ import co.geomati.timegod.ui.callbacks.RemovePokerCallback;
 import co.geomati.timegod.ui.callbacks.RemoveTaskCallback;
 import co.geomati.timegod.ui.callbacks.ReportTaskTimesCallback;
 import co.geomati.timegod.ui.callbacks.SetPokerEventCallback;
-import co.geomati.websocketBus.Callback;
 import co.geomati.websocketBus.WebsocketBus;
 
 @WebListener
 public class SaveAndBroadcast implements ServletContextListener {
 
-	private Callback loggingCallback = new LoggingCallback();
+	private static final LoggingCallback[] loggingCallbacks = new LoggingCallback[] {
+			new AddPokerCallback(), new ChangePokerKeywordsCallback(),
+			new ChangePokerTotalCreditsCallback(), new RemovePokerCallback(),
+			new AddTaskCallback(), new RemoveTaskCallback(),
+			new ChangeTaskNameCallback(), new ChangeTaskUserCreditsCallback(),
+			new ChangeTaskCommonCreditsCallback(),
+			new ChangeTaskWikiCallback(), new ChangeTaskKeywordsCallback(),
+			new ReportTaskTimesCallback(), new SetPokerEventCallback() };
 
 	public void contextInitialized(ServletContextEvent sce) {
 		WebsocketBus bus = WebsocketBus.INSTANCE;
 
 		bus.addListener("add-developer", new AddDeveloperCallback());
 		bus.addListener("remove-developer", new RemoveDeveloperCallback());
-		addBusLoggedListener(bus, "add-poker", new AddPokerCallback());
-		addBusLoggedListener(bus, "change-poker-keywords",
-				new ChangePokerKeywordsCallback());
-		addBusLoggedListener(bus, "add-poker-event",
-				new SetPokerEventCallback());
-		addBusLoggedListener(bus, "change-poker-totalCredits",
-				new ChangePokerTotalCreditsCallback());
-		addBusLoggedListener(bus, "remove-poker", new RemovePokerCallback());
-		addBusLoggedListener(bus, "add-task-to-poker", new AddTaskCallback());
-		addBusLoggedListener(bus, "remove-task", new RemoveTaskCallback());
-		addBusLoggedListener(bus, "change-task-name",
-				new ChangeTaskNameCallback());
-		addBusLoggedListener(bus, "change-task-user-credits",
-				new ChangeTaskUserCreditsCallback());
-		addBusLoggedListener(bus, "change-task-common-credits",
-				new ChangeTaskCommonCreditsCallback());
-		addBusLoggedListener(bus, "change-task-wiki",
-				new ChangeTaskWikiCallback());
-		addBusLoggedListener(bus, "change-task-keywords",
-				new ChangeTaskKeywordsCallback());
-		addBusLoggedListener(bus, ReportTaskTimesCallback.EVENT_NAME,
-				new ReportTaskTimesCallback());
-
 		bus.addListener("get-developers", new GetDevelopersCallback());
 		bus.addListener("get-pokers", new GetPokersCallback());
 		bus.addListener("get-poker", new GetPokerCallback());
-
 		bus.addListener("get-taxonomy", new GetTaxonomyCallback());
 
-	}
+		HashMap<String, LoggingCallback> loggingCallbackRegistry = new HashMap<String, LoggingCallback>();
+		for (LoggingCallback loggingCallback : loggingCallbacks) {
+			bus.addListener(loggingCallback.getEventName(), loggingCallback);
+			loggingCallbackRegistry.put(loggingCallback.getEventName(),
+					loggingCallback);
+		}
 
-	private void addBusLoggedListener(WebsocketBus bus, String eventName,
-			Callback callback) {
-		bus.addListener(eventName, callback);
-		bus.addListener(eventName, loggingCallback);
+		sce.getServletContext().setAttribute("logging-call-back-registry",
+				loggingCallbackRegistry);
+
 	}
 
 	public void contextDestroyed(ServletContextEvent sce) {
