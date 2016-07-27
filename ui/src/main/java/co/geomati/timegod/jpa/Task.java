@@ -19,8 +19,6 @@ public class Task {
 
 	private String[] keywords;
 
-	private String wiki;
-
 	private long creationTime;
 
 	@OneToMany
@@ -97,13 +95,5 @@ public class Task {
 
 	public long getCreationTime() {
 		return creationTime;
-	}
-
-	public void setWiki(String wiki) {
-		this.wiki = wiki;
-	}
-
-	public String getWiki() {
-		return wiki;
 	}
 }

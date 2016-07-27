@@ -1,6 +1,7 @@
 define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bus, wsbus, editableList) {
 
    var pokerListId = "poker-list";
+   var userName = null;
 
    bus.send("ui-element:create", {
       "type" : "div",
@@ -17,12 +18,16 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    list.add(function(text) {
       bus.send("add-poker", [ {
          "name" : text,
+         "developerName" : userName,
          "tasks" : []
       } ]);
    });
 
    list.remove(function(p) {
-      bus.send("remove-poker", [ p.name ]);
+      bus.send("remove-poker", {
+         "pokerName" : p.name,
+         "developerName" : userName
+      });
    });
 
    list.select(function(d) {
@@ -43,6 +48,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
                bus.stopListen("taxonomy-processed", taxonomyProcessedListener);
                wsbus.send("change-poker-keywords", {
                   "pokerName" : poker.name,
+                  "developerName" : userName,
                   "keywords" : keywords
                });
             }
@@ -84,4 +90,8 @@ define([ "d3", "message-bus", "websocket-bus", "editableList" ], function(d3, bu
    bus.listen("ui-update-poker-list", function(e, pokerList) {
       list.refresh(pokerList);
    });
+   bus.listen("set-user", function(e, newUserName) {
+      userName = newUserName;
+   });
+
 });

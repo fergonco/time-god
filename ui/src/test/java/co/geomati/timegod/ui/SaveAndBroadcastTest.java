@@ -69,7 +69,8 @@ public class SaveAndBroadcastTest {
 		Callback callback = new AddDeveloperCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
 		JsonElement developerMessage = parse("{\"name\" : 'fergonco'}");
-		callback.messageReceived(mock(Caller.class), bus, developerMessage);
+		callback.messageReceived(mock(Caller.class), bus, "eventName",
+				developerMessage);
 
 		assertEquals(developerMessage, getResponse(bus, "developer-added"));
 	}
@@ -80,7 +81,8 @@ public class SaveAndBroadcastTest {
 		Callback callback = new RemoveDeveloperCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
 		JsonElement developerId = parse("'fergonco'");
-		callback.messageReceived(mock(Caller.class), bus, developerId);
+		callback.messageReceived(mock(Caller.class), bus, "eventName",
+				developerId);
 
 		assertEquals(developerId, getResponse(bus, "developer-removed"));
 	}
@@ -90,7 +92,8 @@ public class SaveAndBroadcastTest {
 		Callback callback = new AddPokerCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
 		JsonObject pokerMessage = (JsonObject) parse("{\"name\" : 'fua',\"tasks\" : []}");
-		callback.messageReceived(mock(Caller.class), bus, pokerMessage);
+		callback.messageReceived(mock(Caller.class), bus, "eventName",
+				pokerMessage);
 
 		JsonObject broadcastedPoker = (JsonObject) getResponse(bus,
 				"poker-added");
@@ -111,7 +114,7 @@ public class SaveAndBroadcastTest {
 		Callback callback = new RemovePokerCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
 		JsonElement pokerId = parse("'fua'");
-		callback.messageReceived(mock(Caller.class), bus, pokerId);
+		callback.messageReceived(mock(Caller.class), bus, "eventName", pokerId);
 
 		assertEquals(pokerId, getResponse(bus, "poker-removed"));
 	}
@@ -125,7 +128,8 @@ public class SaveAndBroadcastTest {
 				+ "\"estimations\" : {},"
 				+ "\"creationTime\" : 82734628,"
 				+ "\"commonEstimation\" : null}}");
-		callback.messageReceived(mock(Caller.class), bus, taskMessage);
+		callback.messageReceived(mock(Caller.class), bus, "eventName",
+				taskMessage);
 
 		JsonObject task = (JsonObject) getResponse(bus, "task-added");
 		assertEquals(taskMessage.get("name"), task.get("name"));
@@ -140,7 +144,7 @@ public class SaveAndBroadcastTest {
 				.get("id").getAsLong();
 		Callback callback = new RemoveTaskCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
-		callback.messageReceived(mock(Caller.class), bus,
+		callback.messageReceived(mock(Caller.class), bus, "eventName",
 				parse("{\"taskId\":\"" + taskId + "\"}"));
 
 		assertEquals(taskId, ((JsonObject) getResponse(bus, "task-removed"))
@@ -155,7 +159,7 @@ public class SaveAndBroadcastTest {
 				.get("id").getAsLong();
 		Callback callback = new ChangeTaskUserCreditsCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
-		callback.messageReceived(mock(Caller.class), bus,
+		callback.messageReceived(mock(Caller.class), bus, "eventName",
 				parse("{\"userName\" : \"fergonco\"," + "\"taskId\" : \""
 						+ taskId + "\"," + "\"credits\" : 12}"));
 
@@ -176,6 +180,7 @@ public class SaveAndBroadcastTest {
 		callback.messageReceived(
 				mock(Caller.class),
 				bus,
+				"eventName",
 				parse("{\"taskId\" : \"" + taskId + "\"," + "\"credits\" : 22}"));
 
 		JsonObject taskResponse = (JsonObject) getResponse(bus, "updated-task");
@@ -190,7 +195,7 @@ public class SaveAndBroadcastTest {
 		testAddDeveloper();
 		Callback callback = new GetDevelopersCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
-		callback.messageReceived(mock(Caller.class), bus, null);
+		callback.messageReceived(mock(Caller.class), bus, "eventName", null);
 		JsonArray list = (JsonArray) getResponse(bus, "updated-developer-list");
 		assertEquals(1, list.size());
 	}
@@ -200,7 +205,7 @@ public class SaveAndBroadcastTest {
 		testAddPoker();
 		Callback callback = new GetPokersCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
-		callback.messageReceived(mock(Caller.class), bus, null);
+		callback.messageReceived(mock(Caller.class), bus, "eventName", null);
 		JsonArray list = (JsonArray) getResponse(bus, "updated-poker-list");
 		assertEquals(1, list.size());
 	}
@@ -210,7 +215,8 @@ public class SaveAndBroadcastTest {
 		testAddPoker();
 		Callback callback = new GetPokerCallback();
 		WebsocketBus bus = mock(WebsocketBus.class);
-		callback.messageReceived(mock(Caller.class), bus, parse("\"fua\""));
+		callback.messageReceived(mock(Caller.class), bus, "eventName",
+				parse("\"fua\""));
 		JsonObject poker = (JsonObject) getResponse(bus, "updated-poker");
 		assertEquals("fua", poker.get("name").getAsString());
 	}

@@ -10,10 +10,10 @@ import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
 
-public class AddDeveloperCallback extends AbstractCallBack implements Callback {
+public class AddDeveloperCallback extends AbstractCallback implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		Developer developer = GSON.fromJson(payload.getAsJsonObject(),
 				Developer.class);
 		EntityManager em = DBUtils.getEntityManager();

@@ -12,10 +12,11 @@ import co.geomati.websocketBus.WebsocketBus;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class AddTaskCallback extends AbstractCallBack implements Callback {
+public class AddTaskCallback extends AbstractLoggingCallback implements
+		Callback, LoggingCallback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject addTaskMessage = payload.getAsJsonObject();
 		Task task = GSON.fromJson(addTaskMessage.get("task"), Task.class);
 		String pokerName = addTaskMessage.get("pokerName").getAsString();
@@ -27,8 +28,39 @@ public class AddTaskCallback extends AbstractCallBack implements Callback {
 		poker.getTasks().add(task);
 		em.getTransaction().commit();
 
-		TaskAddedMessage taskAdded = new TaskAddedMessage(poker.getName(), task);
+		log(eventName, payload,
+				new Memento(pokerName, task.getName(), task.getId()));
 
+		TaskAddedMessage taskAdded = new TaskAddedMessage(poker.getName(), task);
 		bus.broadcast("task-added", GSON.toJsonTree(taskAdded));
+	}
+
+	public String getEventName() {
+		return "add-task-to-poker";
+	}
+
+	@Override
+	protected Class<?> getMementoClass() {
+		return Memento.class;
+	}
+
+	public class Memento {
+		private String pokerName;
+		private String taskName;
+		private long taskId;
+
+		public Memento() {
+		}
+
+		public Memento(String pokerName, String taskName, long taskId) {
+			this.pokerName = pokerName;
+			this.taskName = taskName;
+			this.taskId = taskId;
+		}
+
+		@Override
+		public String toString() {
+			return "Tarea " + taskName + " añadida al poker " + pokerName;
+		}
 	}
 }

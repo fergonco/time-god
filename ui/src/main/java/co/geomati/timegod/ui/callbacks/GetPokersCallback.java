@@ -6,10 +6,10 @@ import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
 
-public class GetPokersCallback extends AbstractCallBack implements Callback {
+public class GetPokersCallback extends AbstractCallback implements Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		sendPokers(bus);
 	}
 }

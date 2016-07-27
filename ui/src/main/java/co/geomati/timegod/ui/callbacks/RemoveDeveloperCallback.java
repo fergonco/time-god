@@ -7,11 +7,11 @@ import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
 
-public class RemoveDeveloperCallback extends AbstractCallBack implements
+public class RemoveDeveloperCallback extends AbstractCallback implements
 		Callback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		String name = removeEntity(Developer.class, payload);
 		bus.broadcast("developer-removed", GSON.toJsonTree(name));
 	}

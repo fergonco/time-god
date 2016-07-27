@@ -2,20 +2,22 @@ package co.geomati.timegod.ui.callbacks;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.lang.StringUtils;
+
 import co.geomati.timegod.jpa.Event;
 import co.geomati.timegod.jpa.Poker;
 import co.geomati.timegod.ui.DBUtils;
-import co.geomati.websocketBus.Callback;
 import co.geomati.websocketBus.Caller;
 import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class SetPokerEventCallback extends AbstractCallBack implements Callback {
+public class SetPokerEventCallback extends AbstractLoggingCallback implements
+		LoggingCallback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		String pokerName = updateTaskMessage.get("pokerName").getAsString();
 		long timestamp = updateTaskMessage.get("timestamp").getAsLong();
@@ -31,7 +33,37 @@ public class SetPokerEventCallback extends AbstractCallBack implements Callback 
 		poker.getEvents().add(event);
 		em.getTransaction().commit();
 
+		log(eventName, payload, new Memento(pokerName, keywords));
+
 		bus.broadcast("updated-poker", GSON.toJsonTree(poker));
 	}
 
+	public String getEventName() {
+		return "add-poker-event";
+	}
+
+	@Override
+	protected Class<?> getMementoClass() {
+		return Memento.class;
+	}
+
+	public class Memento {
+		private String pokerName;
+		private String[] keywords;
+
+		public Memento() {
+		}
+
+		public Memento(String pokerName, String[] keywords) {
+			super();
+			this.pokerName = pokerName;
+			this.keywords = keywords;
+		}
+
+		@Override
+		public String toString() {
+			return "en poker " + pokerName + ", evento "
+					+ StringUtils.join(keywords, ",");
+		}
+	}
 }

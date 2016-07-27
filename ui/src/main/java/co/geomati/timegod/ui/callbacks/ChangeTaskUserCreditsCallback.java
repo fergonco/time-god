@@ -13,11 +13,11 @@ import co.geomati.websocketBus.WebsocketBus;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ChangeTaskUserCreditsCallback extends AbstractCallBack implements
-		Callback {
+public class ChangeTaskUserCreditsCallback extends AbstractLoggingCallback
+		implements Callback, LoggingCallback {
 
 	public void messageReceived(Caller caller, WebsocketBus bus,
-			JsonElement payload) {
+			String eventName, JsonElement payload) {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();
@@ -30,7 +30,39 @@ public class ChangeTaskUserCreditsCallback extends AbstractCallBack implements
 		em.persist(estimation);
 		task.getEstimations().add(estimation);
 		em.getTransaction().commit();
+
+		log(eventName, payload,
+				new Memento(task.getName(), estimation.getValue()));
+
 		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
 				task.getPoker().getName(), task)));
+	}
+
+	public String getEventName() {
+		return "change-task-user-credits";
+	}
+
+	@Override
+	protected Class<?> getMementoClass() {
+		return Memento.class;
+	}
+
+	public class Memento {
+		private String taskName;
+		private int estimation;
+
+		public Memento() {
+		}
+
+		public Memento(String taskName, int estimation) {
+			super();
+			this.taskName = taskName;
+			this.estimation = estimation;
+		}
+
+		@Override
+		public String toString() {
+			return "Estimación para la tarea " + taskName + " a " + estimation;
+		}
 	}
 }
