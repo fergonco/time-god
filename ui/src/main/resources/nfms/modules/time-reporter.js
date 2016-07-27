@@ -108,10 +108,18 @@ define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbu
       dayInc(0);
 
       var now = new Date();
-      uiValues.set("txtTime", now.getHours() + "." + now.getMinutes() + "-" + (now.getHours() + 1) + "."
-         + now.getMinutes());
+      uiValues.set("txtTime", now.getHours() + "." + twoDigits(now.getMinutes()) + "-" + (now.getHours() + 1) + "."
+         + twoDigits(now.getMinutes()));
       bus.send("time-report-change");
    });
+   
+   function twoDigits(value) {
+      if (value < 10) {
+         return "0" + value;
+      } else {
+         return value;
+      }
+   }
 
    bus.listen("btnReport-click", function() {
       try {
