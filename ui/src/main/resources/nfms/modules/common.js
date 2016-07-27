@@ -25,9 +25,8 @@ define([ "message-bus", "ui-values" ], function(bus, uiValues) {
          "text" : "Informe reportes de tiempo",
          "sendEventName" : "show-time-report"
       });
-
    });
-
+   
    bus.listen("ui-update-poker-list", function(e, newPokers) {
       pokers = newPokers;
    });

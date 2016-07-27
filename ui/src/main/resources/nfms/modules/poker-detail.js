@@ -1,4 +1,5 @@
-define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], function(d3, bus, wsbus, editableList) {
+define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "markdown" ], function(d3, bus, wsbus,
+   editableList, latinize) {
 
    var userName = null;
    var poker = null;
@@ -289,7 +290,29 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "markdown" ], fun
             "sendEventMessage" : d
          });
       });
+
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Wiki",
+            "sendEventName" : "show-wiki",
+            "sendEventMessage" : d.name
+         });
+      });
    });
+
+   bus.listen("show-wiki", function(e, taskName) {
+      window.open("https://github.com/michogar/fao-workplan/blob/master/" + urlize(pokerName) + "/" + urlize(taskName)
+         + ".md", "_blank");
+   });
+
+   function urlize(input) {
+      input = latinize(input);
+      input = input.replace(/\s/g, "_");
+      return input;
+   }
 
    bus.listen("rename-task", function(e, task) {
       var dialogOptions = {
