@@ -15,7 +15,6 @@ import co.geomati.timegod.ui.callbacks.ChangeTaskCommonCreditsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskKeywordsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskNameCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskUserCreditsCallback;
-import co.geomati.timegod.ui.callbacks.ChangeTaskWikiCallback;
 import co.geomati.timegod.ui.callbacks.GetDevelopersCallback;
 import co.geomati.timegod.ui.callbacks.GetPokerCallback;
 import co.geomati.timegod.ui.callbacks.GetPokersCallback;
@@ -37,8 +36,8 @@ public class SaveAndBroadcast implements ServletContextListener {
 			new AddTaskCallback(), new RemoveTaskCallback(),
 			new ChangeTaskNameCallback(), new ChangeTaskUserCreditsCallback(),
 			new ChangeTaskCommonCreditsCallback(),
-			new ChangeTaskWikiCallback(), new ChangeTaskKeywordsCallback(),
-			new ReportTaskTimesCallback(), new SetPokerEventCallback() };
+			new ChangeTaskKeywordsCallback(), new ReportTaskTimesCallback(),
+			new SetPokerEventCallback() };
 
 	public void contextInitialized(ServletContextEvent sce) {
 		WebsocketBus bus = WebsocketBus.INSTANCE;
