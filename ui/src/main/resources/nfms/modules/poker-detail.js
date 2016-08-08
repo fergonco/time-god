@@ -266,19 +266,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
    });
 
    list.postProcess(function(selection) {
-      currentView(selection);
-
-      selection.attr("title", function(t) {
-         var ret = "";
-         if (t.keywords) {
-            for (var i = 0; i < t.keywords.length; i++) {
-               ret += t.keywords[i] + ",";
-
-            }
-            ret = ret.substring(0, ret.length - 1);
-         }
-         return ret + " | creationDate: " + new Date(t.creationTime);
-      });
 
       selection//
       .append("span")//
@@ -300,6 +287,45 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
             "sendEventName" : "show-wiki",
             "sendEventMessage" : d.name
          });
+      });
+
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Wiki",
+            "sendEventName" : "show-wiki",
+            "sendEventMessage" : d.name
+         });
+      });
+
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Crear issue",
+            "sendEventName" : "create-issue",
+            "sendEventMessage" : {
+               "taskName" : d.name,
+               "issueRepository" : poker.issueRepository
+            }
+         });
+      });
+
+      currentView(selection);
+
+      selection.attr("title", function(t) {
+         var ret = "";
+         if (t.keywords) {
+            for (var i = 0; i < t.keywords.length; i++) {
+               ret += t.keywords[i] + ",";
+
+            }
+            ret = ret.substring(0, ret.length - 1);
+         }
+         return ret + " | creationDate: " + new Date(t.creationTime);
       });
    });
 
