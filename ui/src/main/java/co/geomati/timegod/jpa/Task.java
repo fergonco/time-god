@@ -19,6 +19,8 @@ public class Task {
 
 	private String[] keywords;
 
+	private int[] issues;
+
 	private long creationTime;
 
 	@OneToMany
@@ -95,5 +97,13 @@ public class Task {
 
 	public long getCreationTime() {
 		return creationTime;
+	}
+
+	public int[] getIssues() {
+		return issues;
+	}
+
+	public void setIssues(int[] issues) {
+		this.issues = issues;
 	}
 }

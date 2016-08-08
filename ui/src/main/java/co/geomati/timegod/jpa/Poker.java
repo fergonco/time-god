@@ -22,6 +22,8 @@ public class Poker {
 
 	private int totalCredits;
 
+	private String issueRepository;
+
 	public String getName() {
 		return name;
 	}
@@ -53,5 +55,13 @@ public class Poker {
 
 	public int getTotalCredits() {
 		return totalCredits;
+	}
+
+	public String getIssueRepository() {
+		return issueRepository;
+	}
+
+	public void setIssueRepository(String issueRepository) {
+		this.issueRepository = issueRepository;
 	}
 }

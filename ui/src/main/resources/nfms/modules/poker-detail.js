@@ -43,6 +43,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       "sendEventName" : "register-event"
    });
 
+   bus.send("ui-button:create", {
+      "div" : "poker-detail-configurePoker",
+      "parentDiv" : divButtonsId,
+      "text" : "Configuración",
+      "sendEventName" : "configure-poker"
+   });
+
    bus.listen("register-event", function(e, message) {
       var eventTaxonomyListener = function(e, type, keywords) {
          if (type == "event") {
@@ -57,6 +64,21 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       };
       bus.listen("taxonomy-processed", eventTaxonomyListener);
       bus.send("show-taxonomy", [ d3.select("#poker-detail-registerEvent").node(), "event" ]);
+   });
+
+   bus.listen("configure-poker", function() {
+      var dialogOptions = {
+         "message" : "Introduce el repositorio de issues",
+         "okAction" : function(value) {
+            wsbus.send("change-poker-issueRepository", {
+               "pokerName" : poker.name,
+               "issueRepository" : value,
+               "developerName" : userName
+            });
+         },
+         "initialValue" : poker.issueRepository
+      };
+      bus.send("jsdialogs.question", [ dialogOptions ]);
    });
 
    bus.listen("totalCreditsUpdated", function(e, value) {
@@ -307,10 +329,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
             "element" : this,
             "text" : "Crear issue",
             "sendEventName" : "create-issue",
-            "sendEventMessage" : {
-               "taskName" : d.name,
-               "issueRepository" : poker.issueRepository
-            }
+            "sendEventMessage" : d
          });
       });
 
@@ -332,6 +351,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
    bus.listen("show-wiki", function(e, taskName) {
       window.open("https://github.com/michogar/fao-workplan/blob/master/" + urlize(pokerName) + "/" + urlize(taskName)
          + ".md", "_blank");
+   });
+
+   bus.listen("create-issue", function(e, task) {
+      wsbus.send("add-task-issue", {
+         "developerName" : userName,
+         "taskId" : task.id
+      });
    });
 
    function urlize(input) {
@@ -421,9 +447,11 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
 
             // event list
             var eventReport = "Eventos:\n";
-            for (var i = 0; i < poker.events.length; i++) {
-               var event = poker.events[i];
-               eventReport += new Date(event.timestamp) + "\t" + event.keywords + "\n";
+            if (poker.events) {
+               for (var i = 0; i < poker.events.length; i++) {
+                  var event = poker.events[i];
+                  eventReport += new Date(event.timestamp) + "\t" + event.keywords + "\n";
+               }
             }
             bus.send("ui-set-content", {
                "div" : "poker-detail-events",

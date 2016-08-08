@@ -44,6 +44,7 @@ public class TaskMapping implements JsonSerializer<Task>,
 		t.setCommonEstimation(getAsInteger(jsonTask.get("commonEstimation")));
 		ArrayList<Estimation> estimations = new ArrayList<Estimation>();
 		t.setEstimations(estimations);
+		t.setIssues(DEFAULT_GSON.fromJson(jsonTask.get("issues"), int[].class));
 
 		JsonObject jsonEstimations = jsonTask.get("estimations")
 				.getAsJsonObject();
@@ -74,6 +75,7 @@ public class TaskMapping implements JsonSerializer<Task>,
 		ret.addProperty("name", src.getName());
 		ret.addProperty("creationTime", src.getCreationTime());
 		ret.add("keywords", DEFAULT_GSON.toJsonTree(src.getKeywords()));
+		ret.add("issues", DEFAULT_GSON.toJsonTree(src.getIssues()));
 		ret.addProperty("commonEstimation", src.getCommonEstimation());
 		JsonObject jsonEstimations = new JsonObject();
 		ret.add("estimations", jsonEstimations);
