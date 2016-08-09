@@ -47,7 +47,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       "div" : "poker-detail-configurePoker",
       "parentDiv" : divButtonsId,
       "text" : "Configuración",
-      "sendEventName" : "configure-poker"
+      "sendEventName" : "btn-configure-poker"
    });
 
    bus.listen("register-event", function(e, message) {
@@ -66,19 +66,8 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       bus.send("show-taxonomy", [ d3.select("#poker-detail-registerEvent").node(), "event" ]);
    });
 
-   bus.listen("configure-poker", function() {
-      var dialogOptions = {
-         "message" : "Introduce el repositorio de issues",
-         "okAction" : function(value) {
-            wsbus.send("change-poker-issueRepository", {
-               "pokerName" : poker.name,
-               "issueRepository" : value,
-               "developerName" : userName
-            });
-         },
-         "initialValue" : poker.issueRepository
-      };
-      bus.send("jsdialogs.question", [ dialogOptions ]);
+   bus.listen("btn-configure-poker", function() {
+      bus.send("configure-poker", poker);
    });
 
    bus.listen("totalCreditsUpdated", function(e, value) {
@@ -362,19 +351,18 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          return "task-" + taskAndIssue.task.id + "-issue-" + taskAndIssue.issueNumber
       }
       issueSelection.exit().remove();
-      var repo = "https://github.com/fergonco/time-god/";
       issueSelection.enter().append("li")//
       .attr("id", function(taskAndIssue) {
          return getIssueElementId(taskAndIssue);
       })//
       .attr("class", "issue")//
       .html(function(taskAndIssue) {
-         return repo + "issues/" + taskAndIssue.issueNumber;
+         return poker.webRepository + "issues/" + taskAndIssue.issueNumber;
       })//
       .each(function(taskAndIssue) {
          var issueDOMId = getIssueElementId(taskAndIssue);
          bus.send("ajax", {
-            "url" : poker.issueRepository + "issues/" + taskAndIssue.issueNumber,
+            "url" : poker.apiRepository + "issues/" + taskAndIssue.issueNumber,
             "cache" : false,
             "success" : function(data) {
 
@@ -382,7 +370,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
                   "div" : issueDOMId,
                   "html" : ""
                });
-               console.log("setting class from " + issueDOMId + " to " + data.state);
                bus.send("ui-attr", {
                   "div" : issueDOMId,
                   "attribute" : "class",
@@ -418,7 +405,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
                bus.send("ui-attr", {
                   "div" : issueDOMId + "-a",
                   "attribute" : "href",
-                  "value" : repo + "issues/" + taskAndIssue.issueNumber
+                  "value" : poker.webRepository + "issues/" + taskAndIssue.issueNumber
                });
                bus.send("ui-attr", {
                   "div" : issueDOMId + "-a",

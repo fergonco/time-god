@@ -32,8 +32,7 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		EntityManager em = DBUtils.getEntityManager();
 		Task task = em.find(Task.class, taskId);
-		String issueRepository = task.getPoker().getIssueRepository()
-				+ "issues";
+		String issueRepository = task.getPoker().getAPIRepository() + "issues";
 		String encoding = new String(
 				Base64.encodeBase64("fergonco:desarrollista80".getBytes()));
 		PostMethod post = new PostMethod(issueRepository);
