@@ -30,6 +30,7 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 			String eventName, JsonElement payload) throws CallbackException {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
+		String issueName = updateTaskMessage.get("title").getAsString();
 		EntityManager em = DBUtils.getEntityManager();
 		Task task = em.find(Task.class, taskId);
 		String issueRepository = task.getPoker().getAPIRepository() + "issues";
@@ -40,8 +41,8 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 		int issueNumber = -1;
 		try {
 			RequestEntity requestEntity = new StringRequestEntity(
-					"{\"title\":\"" + task.getName() + "\"}",
-					"application/json", "utf-8");
+					"{\"title\":\"" + issueName + "\"}", "application/json",
+					"utf-8");
 			post.setRequestEntity(requestEntity);
 			HttpClient client = new HttpClient();
 			int status = client.executeMethod(post);

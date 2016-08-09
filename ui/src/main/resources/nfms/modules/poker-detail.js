@@ -453,10 +453,17 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
    });
 
    bus.listen("create-issue", function(e, task) {
-      wsbus.send("add-task-issue", {
-         "developerName" : userName,
-         "taskId" : task.id
-      });
+      bus.send("jsdialogs.question", [ {
+         "message" : "Introduce el nombre de la issue",
+         "okAction" : function(value) {
+            wsbus.send("add-task-issue", {
+               "developerName" : userName,
+               "title" : value,
+               "taskId" : task.id
+            });
+         },
+         "initialValue" : task.name
+      } ]);
    });
 
    bus.listen("btn-associate-issue", function(e, task) {
