@@ -1,18 +1,26 @@
 #poker-detail {
-	max-width: 1200px;
-}
-
-.task-entry {
-	background-color: gray;
-	clear: both;
+	max-width: 90vw;
 }
 
 .task-entry span, .task-entry input {
 	float: right;
 }
 
+.task-entry>progress {
+	margin: 0px 20px;
+}
+
+.editableListEntry ul {
+	margin-top: 4px;
+	margin-bottom: 0px;
+}
+
+.editableListEntry li {
+	line-height: 1em;
+}
+
 .issue-closed {
-	 text-decoration: line-through;
+	text-decoration: line-through;
 }
 
 .issue img {
@@ -25,6 +33,27 @@
 	margin-left: 10px;
 }
 
+.issue span {
+	float: none;
+	background: none;
+}
+
 .issue-closed a {
-    color: #666666;
+	color: #666666;
+}
+
+#poker-detail-events {
+	float: right;
+	border-top: 1px solid black;
+	border-left: 1px solid black;
+}
+
+#txt-project-totalCredits-label {
+	margin-left: 30vw;
+}
+#progress-project-estimated-label {
+	margin-left: 30vw;
+}
+#progress-project-real-label {
+	margin-left: 30vw;
 }

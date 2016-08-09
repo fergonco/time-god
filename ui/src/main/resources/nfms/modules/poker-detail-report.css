@@ -1,11 +1,6 @@
 h1 {
-	background-color: blue;
-	color: white;
-}
-
-h2 {
-	background-color: lightgray;
-}
-
-h3 {
+	background: white;
+	color: gray;
+	padding: 0px;
+	margin: 10px;
 }

@@ -1,0 +1,21 @@
+.editableListEntry {
+	background: #ECECEC;
+	margin-top: 5px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-left: 10px;
+	border: 1px solid gray;
+	cursor: pointer;
+	vertical-align: middle;
+	line-height: 2em;
+	width: 90vw;
+}
+
+.editableListEntry:hover {
+	background: #DDD;
+}
+
+.editableListEntry .bricksui-span-button {
+	padding: 0px 10px;
+	margin: 0px 5px;
+}

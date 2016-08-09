@@ -1,9 +1,5 @@
 #poker-list {
-	max-width: 1200px;
-}
-
-.poker-entry {
-	background-color: gray;
+	max-width: 90vw;
 }
 
 .poker-entry .bricksui-span-button {
