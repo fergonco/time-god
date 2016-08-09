@@ -315,6 +315,16 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       .each(function(d) {
          bus.send("ui-button:create", {
             "element" : this,
+            "text" : "Asociar issue",
+            "sendEventName" : "btn-associate-issue",
+            "sendEventMessage" : d
+         });
+      });
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
             "text" : "Crear issue",
             "sendEventName" : "create-issue",
             "sendEventMessage" : d
@@ -363,7 +373,20 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          var issueDOMId = getIssueElementId(taskAndIssue);
          bus.send("ajax", {
             "url" : poker.apiRepository + "issues/" + taskAndIssue.issueNumber,
-            "cache" : false,
+            "complete" : function() {
+               bus.send("ui-button:create", {
+                  "div" : issueDOMId + "-btnRemove",
+                  "parentDiv" : issueDOMId,
+                  "image" : "modules/remove.png",
+                  "sendEventName" : "dissociate-issue",
+                  "sendEventMessage" : taskAndIssue
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-btnRemove",
+                  "attribute" : "title",
+                  "value" : "Eliminar asociación issue"
+               });
+            },
             "success" : function(data) {
 
                bus.send("ui-set-content", {
@@ -379,19 +402,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
                   "div" : issueDOMId,
                   "attribute" : "title",
                   "value" : data.body
-               });
-
-               bus.send("ui-button:create", {
-                  "div" : issueDOMId + "-btnRemove",
-                  "parentDiv" : issueDOMId,
-                  "image" : "modules/remove.png",
-                  "sendEventName" : "dissociate-issue",
-                  "sendEventMessage" : taskAndIssue
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId + "-btnRemove",
-                  "attribute" : "title",
-                  "value" : "Eliminar asociación issue"
                });
 
                bus.send("ui-element:create", {
@@ -446,6 +456,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       wsbus.send("add-task-issue", {
          "developerName" : userName,
          "taskId" : task.id
+      });
+   });
+
+   bus.listen("btn-associate-issue", function(e, task) {
+      bus.send("associate-issue", {
+         "task" : task,
+         "poker" : poker
       });
    });
 
