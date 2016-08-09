@@ -19,8 +19,9 @@ public class Poker {
 	private ArrayList<Event> events;
 
 	private String[] keywords;
-
 	private int totalCredits;
+	private String apiRepository;
+	private String webRepository;
 
 	public String getName() {
 		return name;
@@ -54,4 +55,21 @@ public class Poker {
 	public int getTotalCredits() {
 		return totalCredits;
 	}
+
+	public String getAPIRepository() {
+		return apiRepository;
+	}
+
+	public void setApiRepository(String apiRepository) {
+		this.apiRepository = apiRepository;
+	}
+
+	public String getWebRepository() {
+		return webRepository;
+	}
+
+	public void setWebRepository(String webRepository) {
+		this.webRepository = webRepository;
+	}
+
 }

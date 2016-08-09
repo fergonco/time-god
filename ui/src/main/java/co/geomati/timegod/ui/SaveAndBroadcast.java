@@ -9,12 +9,16 @@ import javax.servlet.annotation.WebListener;
 import co.geomati.timegod.ui.callbacks.AddDeveloperCallback;
 import co.geomati.timegod.ui.callbacks.AddPokerCallback;
 import co.geomati.timegod.ui.callbacks.AddTaskCallback;
+import co.geomati.timegod.ui.callbacks.AddTaskIssueCallback;
+import co.geomati.timegod.ui.callbacks.AssociateTaskIssueCallback;
 import co.geomati.timegod.ui.callbacks.ChangePokerKeywordsCallback;
+import co.geomati.timegod.ui.callbacks.ChangePokerRepositoryConfigurationCallback;
 import co.geomati.timegod.ui.callbacks.ChangePokerTotalCreditsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskCommonCreditsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskKeywordsCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskNameCallback;
 import co.geomati.timegod.ui.callbacks.ChangeTaskUserCreditsCallback;
+import co.geomati.timegod.ui.callbacks.DissociateTaskIssueCallback;
 import co.geomati.timegod.ui.callbacks.GetDevelopersCallback;
 import co.geomati.timegod.ui.callbacks.GetPokerCallback;
 import co.geomati.timegod.ui.callbacks.GetPokersCallback;
@@ -32,12 +36,14 @@ public class SaveAndBroadcast implements ServletContextListener {
 
 	private static final LoggingCallback[] loggingCallbacks = new LoggingCallback[] {
 			new AddPokerCallback(), new ChangePokerKeywordsCallback(),
+			new ChangePokerRepositoryConfigurationCallback(),
 			new ChangePokerTotalCreditsCallback(), new RemovePokerCallback(),
 			new AddTaskCallback(), new RemoveTaskCallback(),
 			new ChangeTaskNameCallback(), new ChangeTaskUserCreditsCallback(),
 			new ChangeTaskCommonCreditsCallback(),
 			new ChangeTaskKeywordsCallback(), new ReportTaskTimesCallback(),
-			new SetPokerEventCallback() };
+			new AddTaskIssueCallback(), new DissociateTaskIssueCallback(),
+			new AssociateTaskIssueCallback(), new SetPokerEventCallback() };
 
 	public void contextInitialized(ServletContextEvent sce) {
 		WebsocketBus bus = WebsocketBus.INSTANCE;

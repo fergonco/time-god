@@ -43,6 +43,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       "sendEventName" : "register-event"
    });
 
+   bus.send("ui-button:create", {
+      "div" : "poker-detail-configurePoker",
+      "parentDiv" : divButtonsId,
+      "text" : "Configuración",
+      "sendEventName" : "btn-configure-poker"
+   });
+
    bus.listen("register-event", function(e, message) {
       var eventTaxonomyListener = function(e, type, keywords) {
          if (type == "event") {
@@ -57,6 +64,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       };
       bus.listen("taxonomy-processed", eventTaxonomyListener);
       bus.send("show-taxonomy", [ d3.select("#poker-detail-registerEvent").node(), "event" ]);
+   });
+
+   bus.listen("btn-configure-poker", function() {
+      bus.send("configure-poker", poker);
    });
 
    bus.listen("totalCreditsUpdated", function(e, value) {
@@ -266,19 +277,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
    });
 
    list.postProcess(function(selection) {
-      currentView(selection);
-
-      selection.attr("title", function(t) {
-         var ret = "";
-         if (t.keywords) {
-            for (var i = 0; i < t.keywords.length; i++) {
-               ret += t.keywords[i] + ",";
-
-            }
-            ret = ret.substring(0, ret.length - 1);
-         }
-         return ret + " | creationDate: " + new Date(t.creationTime);
-      });
 
       selection//
       .append("span")//
@@ -301,11 +299,191 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
             "sendEventMessage" : d.name
          });
       });
+
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Refrescar",
+            "sendEventName" : "get-poker",
+            "sendEventMessage" : poker.name
+         });
+      });
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Asociar issue",
+            "sendEventName" : "btn-associate-issue",
+            "sendEventMessage" : d
+         });
+      });
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Crear issue",
+            "sendEventName" : "create-issue",
+            "sendEventMessage" : d
+         });
+      });
+
+      currentView(selection);
+
+      selection.attr("title", function(t) {
+         var ret = "";
+         if (t.keywords) {
+            for (var i = 0; i < t.keywords.length; i++) {
+               ret += t.keywords[i] + ",";
+
+            }
+            ret = ret.substring(0, ret.length - 1);
+         }
+         return ret + " | creationDate: " + new Date(t.creationTime);
+      });
+
+      var issueSelection = selection.append("ul").selectAll(".issue").data(function(task) {
+         var issues = task.issues ? task.issues : [];
+         var ret = [];
+         for (var i = 0; i < issues.length; i++) {
+            ret.push({
+               "task" : task,
+               "issueNumber" : issues[i]
+            });
+         }
+
+         return ret;
+      });
+      function getIssueElementId(taskAndIssue) {
+         return "task-" + taskAndIssue.task.id + "-issue-" + taskAndIssue.issueNumber
+      }
+      issueSelection.exit().remove();
+      issueSelection.enter().append("li")//
+      .attr("id", function(taskAndIssue) {
+         return getIssueElementId(taskAndIssue);
+      })//
+      .attr("class", "issue")//
+      .html(function(taskAndIssue) {
+         return poker.webRepository + "issues/" + taskAndIssue.issueNumber;
+      })//
+      .each(function(taskAndIssue) {
+         var issueDOMId = getIssueElementId(taskAndIssue);
+         bus.send("ajax", {
+            "url" : poker.apiRepository + "issues/" + taskAndIssue.issueNumber,
+            "complete" : function() {
+               bus.send("ui-button:create", {
+                  "div" : issueDOMId + "-btnRemove",
+                  "parentDiv" : issueDOMId,
+                  "image" : "modules/remove.png",
+                  "sendEventName" : "dissociate-issue",
+                  "sendEventMessage" : taskAndIssue
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-btnRemove",
+                  "attribute" : "title",
+                  "value" : "Eliminar asociación issue"
+               });
+            },
+            "success" : function(data) {
+
+               bus.send("ui-set-content", {
+                  "div" : issueDOMId,
+                  "html" : ""
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId,
+                  "attribute" : "class",
+                  "value" : "issue issue-" + data.state
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId,
+                  "attribute" : "title",
+                  "value" : data.body
+               });
+
+               bus.send("ui-element:create", {
+                  "div" : issueDOMId + "-imgUser",
+                  "parentDiv" : issueDOMId,
+                  "type" : "img"
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-imgUser",
+                  "attribute" : "src",
+                  "value" : data.assignee ? data.assignee.avatar_url + "&s=15" : "modules/transparent-pixel.png"
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-imgUser",
+                  "attribute" : "title",
+                  "value" : data.assignee ? data.assignee.login : "sin asignar"
+               });
+
+               bus.send("ui-element:create", {
+                  "div" : issueDOMId + "-a",
+                  "parentDiv" : issueDOMId,
+                  "type" : "a"
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-a",
+                  "attribute" : "href",
+                  "value" : poker.webRepository + "issues/" + taskAndIssue.issueNumber
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-a",
+                  "attribute" : "target",
+                  "value" : "_blank"
+               });
+               bus.send("ui-set-content", {
+                  "div" : issueDOMId + "-a",
+                  "html" : "#" + taskAndIssue.issueNumber + " " + data.title
+               });
+
+            },
+            "errorMsg" : "Could not get information about the issue #" + taskAndIssue.issueNumber
+         });
+      });
+
    });
 
    bus.listen("show-wiki", function(e, taskName) {
       window.open("https://github.com/michogar/fao-workplan/blob/master/" + urlize(pokerName) + "/" + urlize(taskName)
          + ".md", "_blank");
+   });
+
+   bus.listen("create-issue", function(e, task) {
+      bus.send("jsdialogs.question", [ {
+         "message" : "Introduce el nombre de la issue",
+         "okAction" : function(value) {
+            wsbus.send("add-task-issue", {
+               "developerName" : userName,
+               "title" : value,
+               "taskId" : task.id
+            });
+         },
+         "initialValue" : task.name
+      } ]);
+   });
+
+   bus.listen("btn-associate-issue", function(e, task) {
+      bus.send("associate-issue", {
+         "task" : task,
+         "poker" : poker
+      });
+   });
+
+   bus.listen("dissociate-issue", function(e, taskAndIssue) {
+      bus.send("jsdialogs.confirm", [ {
+         "message" : "Quieres desasociar la issue #" + taskAndIssue.issueNumber + " de la tarea?",
+         "okAction" : function() {
+            wsbus.send("dissociate-task-issue", {
+               "developerName" : userName,
+               "taskId" : taskAndIssue.task.id,
+               "issueNumber" : taskAndIssue.issueNumber
+            });
+         }
+      } ]);
    });
 
    function urlize(input) {
@@ -395,9 +573,11 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
 
             // event list
             var eventReport = "Eventos:\n";
-            for (var i = 0; i < poker.events.length; i++) {
-               var event = poker.events[i];
-               eventReport += new Date(event.timestamp) + "\t" + event.keywords + "\n";
+            if (poker.events) {
+               for (var i = 0; i < poker.events.length; i++) {
+                  var event = poker.events[i];
+                  eventReport += new Date(event.timestamp) + "\t" + event.keywords + "\n";
+               }
             }
             bus.send("ui-set-content", {
                "div" : "poker-detail-events",

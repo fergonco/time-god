@@ -1,0 +1,12 @@
+#poker-configuration {
+	padding: 10p;
+}
+
+#poker-configuration label {
+	margin-top: 10px;
+	display: block;
+}
+
+#poker-configuration input {
+	width: 75%;
+}
