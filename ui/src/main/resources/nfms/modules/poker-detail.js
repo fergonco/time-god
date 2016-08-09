@@ -381,6 +381,19 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
                   "value" : data.body
                });
 
+               bus.send("ui-button:create", {
+                  "div" : issueDOMId + "-btnRemove",
+                  "parentDiv" : issueDOMId,
+                  "image" : "modules/remove.png",
+                  "sendEventName" : "dissociate-issue",
+                  "sendEventMessage" : taskAndIssue
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-btnRemove",
+                  "attribute" : "title",
+                  "value" : "Eliminar asociación issue"
+               });
+
                bus.send("ui-element:create", {
                   "div" : issueDOMId + "-imgUser",
                   "parentDiv" : issueDOMId,
@@ -434,6 +447,19 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          "developerName" : userName,
          "taskId" : task.id
       });
+   });
+
+   bus.listen("dissociate-issue", function(e, taskAndIssue) {
+      bus.send("jsdialogs.confirm", [ {
+         "message" : "Quieres desasociar la issue #" + taskAndIssue.issueNumber + " de la tarea?",
+         "okAction" : function() {
+            wsbus.send("dissociate-task-issue", {
+               "developerName" : userName,
+               "taskId" : taskAndIssue.task.id,
+               "issueNumber" : taskAndIssue.issueNumber
+            });
+         }
+      } ]);
    });
 
    function urlize(input) {
