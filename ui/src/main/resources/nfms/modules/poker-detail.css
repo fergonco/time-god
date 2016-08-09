@@ -10,3 +10,21 @@
 .task-entry span, .task-entry input {
 	float: right;
 }
+
+.issue-closed {
+	 text-decoration: line-through;
+}
+
+.issue img {
+	width: 15px;
+	height: 15px;
+	vertical-align: middle;
+}
+
+.issue a {
+	margin-left: 10px;
+}
+
+.issue-closed a {
+    color: #666666;
+}

@@ -316,12 +316,11 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       .each(function(d) {
          bus.send("ui-button:create", {
             "element" : this,
-            "text" : "Wiki",
-            "sendEventName" : "show-wiki",
-            "sendEventMessage" : d.name
+            "text" : "Refrescar",
+            "sendEventName" : "get-poker",
+            "sendEventMessage" : poker.name
          });
       });
-
       selection//
       .append("span")//
       .each(function(d) {
@@ -346,6 +345,96 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          }
          return ret + " | creationDate: " + new Date(t.creationTime);
       });
+
+      var issueSelection = selection.append("ul").selectAll(".issue").data(function(task) {
+         var issues = task.issues ? task.issues : [];
+         var ret = [];
+         for (var i = 0; i < issues.length; i++) {
+            ret.push({
+               "task" : task,
+               "issueNumber" : issues[i]
+            });
+         }
+
+         return ret;
+      });
+      function getIssueElementId(taskAndIssue) {
+         return "task-" + taskAndIssue.task.id + "-issue-" + taskAndIssue.issueNumber
+      }
+      issueSelection.exit().remove();
+      var repo = "https://github.com/fergonco/time-god/";
+      issueSelection.enter().append("li")//
+      .attr("id", function(taskAndIssue) {
+         return getIssueElementId(taskAndIssue);
+      })//
+      .attr("class", "issue")//
+      .html(function(taskAndIssue) {
+         return repo + "issues/" + taskAndIssue.issueNumber;
+      })//
+      .each(function(taskAndIssue) {
+         var issueDOMId = getIssueElementId(taskAndIssue);
+         bus.send("ajax", {
+            "url" : poker.issueRepository + "issues/" + taskAndIssue.issueNumber,
+            "cache" : false,
+            "success" : function(data) {
+
+               bus.send("ui-set-content", {
+                  "div" : issueDOMId,
+                  "html" : ""
+               });
+               console.log("setting class from " + issueDOMId + " to " + data.state);
+               bus.send("ui-attr", {
+                  "div" : issueDOMId,
+                  "attribute" : "class",
+                  "value" : "issue issue-" + data.state
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId,
+                  "attribute" : "title",
+                  "value" : data.body
+               });
+
+               bus.send("ui-element:create", {
+                  "div" : issueDOMId + "-imgUser",
+                  "parentDiv" : issueDOMId,
+                  "type" : "img"
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-imgUser",
+                  "attribute" : "src",
+                  "value" : data.assignee ? data.assignee.avatar_url + "&s=15" : "modules/transparent-pixel.png"
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-imgUser",
+                  "attribute" : "title",
+                  "value" : data.assignee ? data.assignee.login : "sin asignar"
+               });
+
+               bus.send("ui-element:create", {
+                  "div" : issueDOMId + "-a",
+                  "parentDiv" : issueDOMId,
+                  "type" : "a"
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-a",
+                  "attribute" : "href",
+                  "value" : repo + "issues/" + taskAndIssue.issueNumber
+               });
+               bus.send("ui-attr", {
+                  "div" : issueDOMId + "-a",
+                  "attribute" : "target",
+                  "value" : "_blank"
+               });
+               bus.send("ui-set-content", {
+                  "div" : issueDOMId + "-a",
+                  "html" : "#" + taskAndIssue.issueNumber + " " + data.title
+               });
+
+            },
+            "errorMsg" : "Could not get information about the issue #" + taskAndIssue.issueNumber
+         });
+      });
+
    });
 
    bus.listen("show-wiki", function(e, taskName) {
