@@ -24,6 +24,7 @@ import co.geomati.timegod.ui.callbacks.GetPokerCallback;
 import co.geomati.timegod.ui.callbacks.GetPokersCallback;
 import co.geomati.timegod.ui.callbacks.GetTaxonomyCallback;
 import co.geomati.timegod.ui.callbacks.LoggingCallback;
+import co.geomati.timegod.ui.callbacks.ProxyCallback;
 import co.geomati.timegod.ui.callbacks.RemoveDeveloperCallback;
 import co.geomati.timegod.ui.callbacks.RemovePokerCallback;
 import co.geomati.timegod.ui.callbacks.RemoveTaskCallback;
@@ -54,6 +55,7 @@ public class SaveAndBroadcast implements ServletContextListener {
 		bus.addListener("get-pokers", new GetPokersCallback());
 		bus.addListener("get-poker", new GetPokerCallback());
 		bus.addListener("get-taxonomy", new GetTaxonomyCallback());
+		bus.addListener("proxy", new ProxyCallback());
 
 		HashMap<String, LoggingCallback> loggingCallbackRegistry = new HashMap<String, LoggingCallback>();
 		for (LoggingCallback loggingCallback : loggingCallbacks) {

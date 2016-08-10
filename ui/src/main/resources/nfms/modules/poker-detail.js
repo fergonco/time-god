@@ -78,7 +78,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
    });
 
    bus.listen("btn-refresh-poker", function() {
-      bus.send("clear-ajax-cache");
       bus.send("get-poker", poker.name);
    });
 
@@ -373,80 +372,94 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       })//
       .each(function(taskAndIssue) {
          var issueDOMId = getIssueElementId(taskAndIssue);
-         bus.send("cached-ajax", {
+         wsbus.send("proxy", {
             "url" : poker.apiRepository + "issues/" + taskAndIssue.issueNumber,
-            "complete" : function() {
-               bus.send("ui-button:create", {
-                  "div" : issueDOMId + "-btnRemove",
-                  "parentDiv" : issueDOMId,
-                  "image" : "modules/remove.png",
-                  "sendEventName" : "dissociate-issue",
-                  "sendEventMessage" : taskAndIssue
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId + "-btnRemove",
-                  "attribute" : "title",
-                  "value" : "Eliminar asociación issue"
-               });
-            },
-            "success" : function(data) {
-
-               bus.send("ui-set-content", {
-                  "div" : issueDOMId,
-                  "html" : ""
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId,
-                  "attribute" : "class",
-                  "value" : "issue issue-" + data.state
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId,
-                  "attribute" : "title",
-                  "value" : data.body
-               });
-
-               bus.send("ui-element:create", {
-                  "div" : issueDOMId + "-imgUser",
-                  "parentDiv" : issueDOMId,
-                  "type" : "img"
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId + "-imgUser",
-                  "attribute" : "src",
-                  "value" : data.assignee ? data.assignee.avatar_url + "&s=15" : "modules/transparent-pixel.png"
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId + "-imgUser",
-                  "attribute" : "title",
-                  "value" : data.assignee ? data.assignee.login : "sin asignar"
-               });
-
-               bus.send("ui-element:create", {
-                  "div" : issueDOMId + "-a",
-                  "parentDiv" : issueDOMId,
-                  "type" : "a"
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId + "-a",
-                  "attribute" : "href",
-                  "value" : poker.webRepository + "issues/" + taskAndIssue.issueNumber
-               });
-               bus.send("ui-attr", {
-                  "div" : issueDOMId + "-a",
-                  "attribute" : "target",
-                  "value" : "_blank"
-               });
-               bus.send("ui-set-content", {
-                  "div" : issueDOMId + "-a",
-                  "html" : "#" + taskAndIssue.issueNumber + " " + data.title
-               });
-
-            },
-            "errorMsg" : "Could not get information about the issue #" + taskAndIssue.issueNumber
+            "event-name" : "render-issue",
+            "context" : {
+               "id" : issueDOMId,
+               "taskAndIssue" : taskAndIssue
+            }
+         });
+         bus.send("ui-button:create", {
+            "div" : issueDOMId + "-btnRemove",
+            "parentDiv" : issueDOMId,
+            "image" : "modules/remove.png",
+            "sendEventName" : "dissociate-issue",
+            "sendEventMessage" : taskAndIssue
+         });
+         bus.send("ui-attr", {
+            "div" : issueDOMId + "-btnRemove",
+            "attribute" : "title",
+            "value" : "Eliminar asociación issue"
          });
       });
 
+   });
+
+   bus.listen("render-issue", function(e, message) {
+      var data = message.response;
+      var issueDOMId = message.context.id;
+      var taskAndIssue = message.context.taskAndIssue;
+      bus.send("ui-set-content", {
+         "div" : issueDOMId,
+         "html" : ""
+      });
+      bus.send("ui-attr", {
+         "div" : issueDOMId,
+         "attribute" : "class",
+         "value" : "issue issue-" + data.state
+      });
+      bus.send("ui-attr", {
+         "div" : issueDOMId,
+         "attribute" : "title",
+         "value" : data.body
+      });
+
+      bus.send("ui-element:create", {
+         "div" : issueDOMId + "-span",
+         "parentDiv" : issueDOMId,
+         "type" : "span"
+      });
+      bus.send("ui-set-content", {
+         "div" : issueDOMId + "-span",
+         "html" : "#" + taskAndIssue.issueNumber
+      });
+
+      bus.send("ui-element:create", {
+         "div" : issueDOMId + "-imgUser",
+         "parentDiv" : issueDOMId,
+         "type" : "img"
+      });
+      bus.send("ui-attr", {
+         "div" : issueDOMId + "-imgUser",
+         "attribute" : "src",
+         "value" : data.assignee ? data.assignee.avatar_url + "&s=15" : "modules/transparent-pixel.png"
+      });
+      bus.send("ui-attr", {
+         "div" : issueDOMId + "-imgUser",
+         "attribute" : "title",
+         "value" : data.assignee ? data.assignee.login : "sin asignar"
+      });
+
+      bus.send("ui-element:create", {
+         "div" : issueDOMId + "-a",
+         "parentDiv" : issueDOMId,
+         "type" : "a"
+      });
+      bus.send("ui-attr", {
+         "div" : issueDOMId + "-a",
+         "attribute" : "href",
+         "value" : poker.webRepository + "issues/" + taskAndIssue.issueNumber
+      });
+      bus.send("ui-attr", {
+         "div" : issueDOMId + "-a",
+         "attribute" : "target",
+         "value" : "_blank"
+      });
+      bus.send("ui-set-content", {
+         "div" : issueDOMId + "-a",
+         "html" : data.title
+      });
    });
 
    bus.listen("show-wiki", function(e, taskName) {
