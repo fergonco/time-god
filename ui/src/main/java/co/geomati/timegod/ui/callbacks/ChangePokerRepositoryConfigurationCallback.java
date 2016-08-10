@@ -21,20 +21,25 @@ public class ChangePokerRepositoryConfigurationCallback extends
 		Poker poker = em.find(Poker.class, pokerName);
 		String oldAPIRepository = poker.getAPIRepository();
 		String oldWebRepository = poker.getWebRepository();
+		String oldWikiRepository = poker.getWikiRepository();
 		em.getTransaction().begin();
 		String apiRepository = updatePokerMessage.get("apiRepository")
 				.getAsString();
 		String webRepository = updatePokerMessage.get("webRepository")
 				.getAsString();
+		String wikiRepository = updatePokerMessage.get("wikiRepository")
+				.getAsString();
 		apiRepository = inputCheck(apiRepository);
 		webRepository = inputCheck(webRepository);
+		wikiRepository = inputCheck(wikiRepository);
 		poker.setApiRepository(apiRepository);
 		poker.setWebRepository(webRepository);
+		poker.setWikiRepository(wikiRepository);
 		em.getTransaction().commit();
 
-		log(eventName, payload,
-				new Memento(pokerName, oldAPIRepository, oldWebRepository,
-						poker.getAPIRepository(), poker.getWebRepository()));
+		log(eventName, payload, new Memento(pokerName, oldAPIRepository,
+				oldWebRepository, oldWikiRepository, poker.getAPIRepository(),
+				poker.getWebRepository(), poker.getWikiRepository()));
 
 		bus.broadcast("updated-poker", GSON.toJsonTree(poker));
 	}
@@ -61,27 +66,36 @@ public class ChangePokerRepositoryConfigurationCallback extends
 		private String pokerName;
 		private String oldAPIRepository;
 		private String oldWebRepository;
+		private String oldWikiRepository;
 		private String newAPIRepository;
 		private String newWebRepository;
+		private String newWikiRepository;
 
 		public Memento() {
 		}
 
 		public Memento(String pokerName, String oldAPIRepository,
-				String oldWebRepository, String newAPIRepository,
-				String newWebRepository) {
+				String oldWebRepository, String oldWikiRepository,
+				String newAPIRepository, String newWebRepository,
+				String newWikiRepository) {
 			super();
 			this.pokerName = pokerName;
 			this.oldAPIRepository = oldAPIRepository;
 			this.oldWebRepository = oldWebRepository;
+			this.oldWikiRepository = oldWikiRepository;
 			this.newAPIRepository = newAPIRepository;
 			this.newWebRepository = newWebRepository;
+			this.newWikiRepository = newWikiRepository;
 		}
 
 		@Override
 		public String toString() {
 			return "en poker "
 					+ pokerName
+					+ "\n" //
+					+ " Wiki de: " + oldWikiRepository
+					+ "\n      a: "
+					+ newWikiRepository
 					+ "\n" //
 					+ " API de: " + oldAPIRepository + "\n      a: "
 					+ newAPIRepository

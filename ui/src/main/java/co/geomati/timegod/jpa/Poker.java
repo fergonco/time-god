@@ -22,6 +22,7 @@ public class Poker {
 	private int totalCredits;
 	private String apiRepository;
 	private String webRepository;
+	private String wikiRepository;
 
 	public String getName() {
 		return name;
@@ -72,4 +73,11 @@ public class Poker {
 		this.webRepository = webRepository;
 	}
 
+	public String getWikiRepository() {
+		return wikiRepository;
+	}
+
+	public void setWikiRepository(String wikiRepository) {
+		this.wikiRepository = wikiRepository;
+	}
 }

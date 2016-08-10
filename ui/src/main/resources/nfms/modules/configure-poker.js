@@ -24,12 +24,20 @@ define([ "message-bus", "websocket-bus", "ui-values" ], function(bus, wsbus, uiV
       });
       uiValues.set(pokerConfigurationId + "-web-root", poker.webRepository);
 
+      bus.send("ui-input-field:create", {
+         "div" : pokerConfigurationId + "-wiki-root",
+         "parentDiv" : pokerConfigurationId,
+         "text" : "Repositorio wiki (e.g.: https://github.com/fergonco/time-god/)"
+      });
+      uiValues.set(pokerConfigurationId + "-wiki-root", poker.wikiRepository);
+
       var dialogOptions = {
          "okAction" : function() {
             wsbus.send("change-poker-repository-configuration", {
                "pokerName" : poker.name,
                "apiRepository" : uiValues.get(pokerConfigurationId + "-api-root"),
                "webRepository" : uiValues.get(pokerConfigurationId + "-web-root"),
+               "wikiRepository" : uiValues.get(pokerConfigurationId + "-wiki-root"),
                "developerName" : userName
             });
          },
