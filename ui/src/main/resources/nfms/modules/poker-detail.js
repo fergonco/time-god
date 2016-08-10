@@ -285,7 +285,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
    });
 
    list.renderer(function(d) {
-      return d.name;
+      return d.name + "(#" + d.id + ")";
    });
 
    list.postProcess(function(selection) {
