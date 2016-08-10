@@ -34,8 +34,10 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 		EntityManager em = DBUtils.getEntityManager();
 		Task task = em.find(Task.class, taskId);
 		String issueRepository = task.getPoker().getAPIRepository() + "issues";
+		String user = System.getenv("TIMEGOD_GITHUB_API_USER");
+		String password = System.getenv("TIMEGOD_GITHUB_API_PASSWORD");
 		String encoding = new String(
-				Base64.encodeBase64("fergonco:desarrollista80".getBytes()));
+				Base64.encodeBase64((user + ":" + password).getBytes()));
 		PostMethod post = new PostMethod(issueRepository);
 		post.addRequestHeader("Authorization", "Basic " + encoding);
 		int issueNumber = -1;
