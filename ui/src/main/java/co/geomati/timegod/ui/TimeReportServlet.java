@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 
 import co.geomati.timegod.ui.callbacks.ReportTaskTimesCallback;
+import co.geomati.websocketBus.CallbackException;
 import co.geomati.websocketBus.WebsocketBus;
 
 import com.google.gson.JsonElement;
@@ -36,9 +37,11 @@ public class TimeReportServlet extends HttpServlet {
 					payload);
 			resp.setStatus(201);
 		} catch (JsonSyntaxException e) {
-			resp.sendError(400);
+			resp.sendError(400, "Cannot parse json:" + e.getMessage());
 		} catch (RuntimeException e) {
 			resp.sendError(400);
+		} catch (CallbackException e) {
+			resp.sendError(400, e.getMessage());
 		}
 	}
 }

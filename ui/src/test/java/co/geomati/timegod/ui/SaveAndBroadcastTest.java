@@ -1,6 +1,7 @@
 package co.geomati.timegod.ui;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -228,6 +229,20 @@ public class SaveAndBroadcastTest {
 		return new JsonParser().parse(json);
 	}
 
+	private HttpServletResponse testTimeReport(String message)
+			throws IOException, ServletException {
+		TimeReportServlet servlet = new TimeReportServlet();
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		HttpServletResponse response = mock(HttpServletResponse.class);
+
+		Reader reader = new StringReader(message);
+		when(request.getReader()).thenReturn(new BufferedReader(reader));
+
+		servlet.doPost(request, response);
+
+		return response;
+	}
+
 	@Test
 	public void postTimeReport() throws ServletException, IOException,
 			CallbackException {
@@ -235,23 +250,258 @@ public class SaveAndBroadcastTest {
 		testAddTask();
 		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
 				.get("id").getAsLong();
-
-		TimeReportServlet servlet = new TimeReportServlet();
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
-
 		long now = new Date().getTime();
-		Reader reader = new StringReader("{" //
+		String message = "{" //
 				+ "taskId:" + taskId + ","//
 				+ "timeStart: " + (now - 1000) + ","//
 				+ "timeEnd: " + now + ","//
 				+ "developerName: \"fergonco\","//
-				+ "keywords:[\"k1\", \"k2\", \"k3\"]"//
-				+ "}");
-		when(request.getReader()).thenReturn(new BufferedReader(reader));
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
 
-		servlet.doPost(request, response);
-
+		HttpServletResponse response = testTimeReport(message);
 		verify(response).setStatus(201);
 	}
+
+	@Test
+	public void postTimeReportWrongDeveloper() throws ServletException,
+			IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"wrong\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
+	@Test
+	public void postTimeReportWrongTaskId() throws ServletException,
+			IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "taskId:2836234,"//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
+	@Test
+	public void postTimeReportWrongTimes() throws ServletException,
+			IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now + 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
+	@Test
+	public void postTimeReportCategoryWithoutKeyword() throws ServletException,
+			IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
+	@Test
+	public void postTimeReportKeywordsWithoutCategory()
+			throws ServletException, IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"this_belongs_to_no_category\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
+	@Test
+	public void postTimeReportRepeatedCategory() throws ServletException,
+			IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"motivacion_normal\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
+	@Test
+	public void postTimeReportMissingParameter() throws ServletException,
+			IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+
+		message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+		response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+
+		message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+		response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+
+		message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+		response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+
+		message = "{" //
+				+ "taskId:" + taskId + ","//
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\""//
+				+ "}";
+		response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
+	@Test
+	public void postTimeReportInvalidJSON() throws ServletException,
+			IOException, CallbackException {
+		testAddDeveloper();
+		testAddTask();
+		long taskId = ((JsonObject) lastResponse).get("task").getAsJsonObject()
+				.get("id").getAsLong();
+		long now = new Date().getTime();
+		String message = "{" //
+				+ "taskId:" + taskId //
+				+ "timeStart: " + (now - 1000) + ","//
+				+ "timeEnd: " + now + ","//
+				+ "developerName: \"fergonco\","//
+				+ "keywords:[\"interrupciones_ninguna\", "//
+				+ "\"urgencia_hay_presion\", "//
+				+ "\"motivacion_mucha\", "//
+				+ "\"satisfaccion_mucha\""//
+				+ "]"//
+				+ "}";
+
+		HttpServletResponse response = testTimeReport(message);
+		verify(response).sendError(eq(400), anyString());
+	}
+
 }
