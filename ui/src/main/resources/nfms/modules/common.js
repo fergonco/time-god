@@ -1,4 +1,4 @@
-define([ "message-bus", "ui-values" ], function(bus, uiValues) {
+define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latinize) {
 
    var dlgAskPokersId = "dlg-ask-pokers";
 
@@ -26,7 +26,7 @@ define([ "message-bus", "ui-values" ], function(bus, uiValues) {
          "sendEventName" : "show-time-report"
       });
    });
-   
+
    bus.listen("ui-update-poker-list", function(e, newPokers) {
       pokers = newPokers;
    });
@@ -63,13 +63,14 @@ define([ "message-bus", "ui-values" ], function(bus, uiValues) {
       });
       for (var i = 0; i < pokers.length; i++) {
          var poker = pokers[i];
+         var chkPokerId = "chkPoker" + latinize.toId(poker.name);
          bus.send("ui-input-field:create", {
-            "div" : "chkPoker" + poker.name,
+            "div" : chkPokerId,
             "parentDiv" : dlgAskPokersId,
             "type" : "checkbox",
             "text" : poker.name
          });
-         uiValues.set("chkPoker" + poker.name, true);
+         uiValues.set(chkPokerId, true);
       }
 
       bus.send("ui-button:create", {
@@ -90,12 +91,12 @@ define([ "message-bus", "ui-values" ], function(bus, uiValues) {
       var selectedPokers = [];
       for (var i = 0; i < pokers.length; i++) {
          var poker = pokers[i];
-         if (uiValues.get("chkPoker" + poker.name)) {
+         if (uiValues.get("chkPoker" + latinize.toId(poker.name))) {
             selectedPokers.push(poker);
          }
       }
       bus.send("ui-dialog:close", dlgAskPokersId);
-      
+
       var timeSegments = [];
       for (var i = 0; i < selectedPokers.length; i++) {
          var poker = selectedPokers[i];
@@ -128,7 +129,7 @@ define([ "message-bus", "ui-values" ], function(bus, uiValues) {
             || start.getFullYear() != lastDay.getFullYear()) {
             wiki += getDeveloperTimes(developerAccum);
 
-            wiki += start.getDate() + "/" + start.getMonth() + "/" + start.getFullYear() + "\n";
+            wiki += start.getDate() + "/" + (start.getMonth() + 1) + "/" + start.getFullYear() + "\n";
             wiki += "-".repeat(30) + "\n\n";
 
             lastDay = start;

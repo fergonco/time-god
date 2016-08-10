@@ -1,5 +1,11 @@
 define([], function() {
 
+   function toId(input) {
+      input = latinize(input);
+      input = input.replace(/\s/g, "_");
+      return input;
+   }
+
    function latinize(input) {
       return input.replace(/[^A-Za-z0-9\[\] ]/g, function(a) {
          return latin_map[a] || a
@@ -21,5 +27,8 @@ define([], function() {
       "ñ" : "n",
    };
 
-   return latinize;
+   return {
+      "latinize" : latinize,
+      "toId" : toId
+   }
 });

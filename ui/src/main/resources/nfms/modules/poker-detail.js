@@ -463,8 +463,8 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
    });
 
    bus.listen("show-wiki", function(e, taskName) {
-      window.open("https://github.com/michogar/fao-workplan/blob/master/" + urlize(pokerName) + "/" + urlize(taskName)
-         + ".md", "_blank");
+      window.open("https://github.com/michogar/fao-workplan/blob/master/" + latinize.toId(pokerName) + "/"
+         + latinize.toId(taskName) + ".md", "_blank");
    });
 
    bus.listen("create-issue", function(e, task) {
@@ -500,12 +500,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          }
       } ]);
    });
-
-   function urlize(input) {
-      input = latinize(input);
-      input = input.replace(/\s/g, "_");
-      return input;
-   }
 
    bus.listen("rename-task", function(e, task) {
       var dialogOptions = {
