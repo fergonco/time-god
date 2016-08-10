@@ -17,6 +17,7 @@
 
 .editableListEntry li {
 	line-height: 1em;
+	list-style: none;
 }
 
 .issue-closed {
@@ -27,15 +28,18 @@
 	width: 15px;
 	height: 15px;
 	vertical-align: middle;
+	margin-left: 5px;
 }
 
 .issue a {
-	margin-left: 10px;
+	margin-left: 5px;
 }
 
 .issue span {
 	float: none;
 	background: none;
+	display: inline-block;
+	width: 2em;
 }
 
 .issue-closed a {
@@ -51,9 +55,11 @@
 #txt-project-totalCredits-label {
 	margin-left: 30vw;
 }
+
 #progress-project-estimated-label {
 	margin-left: 30vw;
 }
+
 #progress-project-real-label {
 	margin-left: 30vw;
 }
