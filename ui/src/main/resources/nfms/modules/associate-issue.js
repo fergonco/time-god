@@ -3,9 +3,8 @@ define([ "message-bus", "websocket-bus", "ui-values" ], function(bus, wsbus, uiV
    var userName = null;
 
    bus.listen("associate-issue", function(e, taskAndPoker) {
-      bus.send("ajax", {
+      bus.send("cached-ajax", {
          "url" : taskAndPoker.poker.apiRepository + "issues",
-         "cache" : false,
          "success" : function(data) {
             var dialogDOMId = "dlgAssociateIssues";
             bus.send("ui-element:create", {

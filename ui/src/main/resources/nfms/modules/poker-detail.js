@@ -50,6 +50,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       "sendEventName" : "btn-configure-poker"
    });
 
+   bus.send("ui-button:create", {
+      "div" : "poker-detail-refreshPoker",
+      "parentDiv" : divButtonsId,
+      "text" : "Refrescar",
+      "sendEventName" : "btn-refresh-poker"
+   });
+
    bus.listen("register-event", function(e, message) {
       var eventTaxonomyListener = function(e, type, keywords) {
          if (type == "event") {
@@ -68,6 +75,11 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
 
    bus.listen("btn-configure-poker", function() {
       bus.send("configure-poker", poker);
+   });
+
+   bus.listen("btn-refresh-poker", function() {
+      bus.send("clear-ajax-cache");
+      bus.send("get-poker", poker.name);
    });
 
    bus.listen("totalCreditsUpdated", function(e, value) {
@@ -305,16 +317,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       .each(function(d) {
          bus.send("ui-button:create", {
             "element" : this,
-            "text" : "Refrescar",
-            "sendEventName" : "get-poker",
-            "sendEventMessage" : poker.name
-         });
-      });
-      selection//
-      .append("span")//
-      .each(function(d) {
-         bus.send("ui-button:create", {
-            "element" : this,
             "text" : "Asociar issue",
             "sendEventName" : "btn-associate-issue",
             "sendEventMessage" : d
@@ -371,7 +373,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       })//
       .each(function(taskAndIssue) {
          var issueDOMId = getIssueElementId(taskAndIssue);
-         bus.send("ajax", {
+         bus.send("cached-ajax", {
             "url" : poker.apiRepository + "issues/" + taskAndIssue.issueNumber,
             "complete" : function() {
                bus.send("ui-button:create", {
