@@ -20,8 +20,7 @@ public class Poker {
 
 	private String[] keywords;
 	private int totalCredits;
-	private String apiRepository;
-	private String webRepository;
+	private String[] issueRepositories;
 	private String wikiRepository;
 
 	public String getName() {
@@ -57,20 +56,12 @@ public class Poker {
 		return totalCredits;
 	}
 
-	public String getAPIRepository() {
-		return apiRepository;
+	public String[] getIssueRepositories() {
+		return issueRepositories;
 	}
 
-	public void setApiRepository(String apiRepository) {
-		this.apiRepository = apiRepository;
-	}
-
-	public String getWebRepository() {
-		return webRepository;
-	}
-
-	public void setWebRepository(String webRepository) {
-		this.webRepository = webRepository;
+	public void setIssueRepositories(String[] issueRepositories) {
+		this.issueRepositories = issueRepositories;
 	}
 
 	public String getWikiRepository() {

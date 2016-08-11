@@ -1,5 +1,5 @@
-define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "markdown" ], function(d3, bus, wsbus,
-   editableList, latinize) {
+define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issues" ], function(d3, bus, wsbus,
+   editableList, latinize, issues) {
 
    var userName = null;
    var poker = null;
@@ -352,28 +352,28 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          for (var i = 0; i < issues.length; i++) {
             ret.push({
                "task" : task,
-               "issueNumber" : issues[i]
+               "issueURL" : issues[i]
             });
          }
 
          return ret;
       });
-      function getIssueElementId(taskAndIssue) {
-         return "task-" + taskAndIssue.task.id + "-issue-" + taskAndIssue.issueNumber
+      function getIssueElementId(taskAndIssue, issueIndex) {
+         return "task-" + taskAndIssue.task.id + "-issue-" + issueIndex
       }
       issueSelection.exit().remove();
       issueSelection.enter().append("li")//
-      .attr("id", function(taskAndIssue) {
-         return getIssueElementId(taskAndIssue);
+      .attr("id", function(taskAndIssue, index) {
+         return getIssueElementId(taskAndIssue, index);
       })//
       .attr("class", "issue")//
       .html(function(taskAndIssue) {
-         return poker.webRepository + "issues/" + taskAndIssue.issueNumber;
+         return issues.issue(taskAndIssue.issueURL).getWebLink();
       })//
-      .each(function(taskAndIssue) {
-         var issueDOMId = getIssueElementId(taskAndIssue);
+      .each(function(taskAndIssue, index) {
+         var issueDOMId = getIssueElementId(taskAndIssue, index);
          wsbus.send("proxy", {
-            "url" : poker.apiRepository + "issues/" + taskAndIssue.issueNumber,
+            "url" : issues.issue(taskAndIssue.issueURL).getAPILink(),
             "event-name" : "render-issue",
             "context" : {
                "id" : issueDOMId,
@@ -404,6 +404,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       var data = message.response;
       var issueDOMId = message.context.id;
       var taskAndIssue = message.context.taskAndIssue;
+      var issue = issues.issue(taskAndIssue.issueURL);
       bus.send("ui-set-content", {
          "div" : issueDOMId,
          "html" : ""
@@ -426,7 +427,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       });
       bus.send("ui-set-content", {
          "div" : issueDOMId + "-span",
-         "html" : "#" + taskAndIssue.issueNumber
+         "html" : "#" + issue.getNumber()
       });
 
       bus.send("ui-element:create", {
@@ -453,7 +454,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       bus.send("ui-attr", {
          "div" : issueDOMId + "-a",
          "attribute" : "href",
-         "value" : poker.webRepository + "issues/" + taskAndIssue.issueNumber
+         "value" : issue.getWebLink()
       });
       bus.send("ui-attr", {
          "div" : issueDOMId + "-a",
@@ -462,7 +463,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       });
       bus.send("ui-set-content", {
          "div" : issueDOMId + "-a",
-         "html" : data.title
+         "html" : data.title + " (" + issue.getRepo() + ")"
       });
       addDissociateButtons(issueDOMId, taskAndIssue);
    });
@@ -472,35 +473,58 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          + latinize.toId(taskName) + ".md", "_blank");
    });
 
+   function getRepository(callback) {
+      if (!poker.issueRepositories || poker.issueRepositories.length == 0) {
+         bus.send("info", "No hay repositorio de issues configurado");
+      } else if (poker.issueRepositories.length == 1) {
+         callback(poker.issueRepositories[0]);
+      } else {
+         bus.send("jsdialogs.choiceQuestion", [ {
+            "message" : "¿De qué repositorio deseas añadir la issue?",
+            "okAction" : function(value) {
+               callback(value);
+            },
+            "choices" : poker.issueRepositories,
+            "initialValue" : poker.issueRepositories[0]
+         } ]);
+      }
+   }
+
    bus.listen("create-issue", function(e, task) {
-      bus.send("jsdialogs.question", [ {
-         "message" : "Introduce el nombre de la issue",
-         "okAction" : function(value) {
-            wsbus.send("add-task-issue", {
-               "developerName" : userName,
-               "title" : value,
-               "taskId" : task.id
-            });
-         },
-         "initialValue" : task.name
-      } ]);
+      getRepository(function(repository) {
+         bus.send("jsdialogs.question", [ {
+            "message" : "Introduce el nombre de la issue",
+            "okAction" : function(value) {
+               wsbus.send("add-task-issue", {
+                  "developerName" : userName,
+                  "repository" : repository,
+                  "title" : value,
+                  "taskId" : task.id
+               });
+            },
+            "initialValue" : task.name
+         } ]);
+      });
    });
 
    bus.listen("btn-associate-issue", function(e, task) {
-      bus.send("associate-issue", {
-         "task" : task,
-         "poker" : poker
+      getRepository(function(repository) {
+         bus.send("associate-issue", {
+            "taskId" : task.id,
+            "repository" : repository
+         });
       });
    });
 
    bus.listen("dissociate-issue", function(e, taskAndIssue) {
+      var issue = issues.issue(taskAndIssue.issueURL);
       bus.send("jsdialogs.confirm", [ {
-         "message" : "Quieres desasociar la issue #" + taskAndIssue.issueNumber + " de la tarea?",
+         "message" : "Quieres desasociar la issue #" + issue.getNumber() + " de la tarea?",
          "okAction" : function() {
             wsbus.send("dissociate-task-issue", {
                "developerName" : userName,
                "taskId" : taskAndIssue.task.id,
-               "issueNumber" : taskAndIssue.issueNumber
+               "issueURL" : taskAndIssue.issueURL
             });
          }
       } ]);

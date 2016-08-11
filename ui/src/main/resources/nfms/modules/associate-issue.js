@@ -1,14 +1,15 @@
-define([ "message-bus", "websocket-bus", "ui-values" ], function(bus, wsbus, uiValues) {
+define([ "message-bus", "websocket-bus", "ui-values", "issues" ], function(bus, wsbus, uiValues, issues) {
 
    var userName = null;
    var dialogDOMId = "dlgAssociateIssues";
 
-   bus.listen("associate-issue", function(e, taskAndPoker) {
+   bus.listen("associate-issue", function(e, taskAndRepo) {
       wsbus.send("proxy", {
-         "url" : taskAndPoker.poker.apiRepository + "issues",
+         "url" : issues.repository(taskAndRepo.repository).getAPIIssuesLink(),
          "event-name" : "associate-issue-show-issue-list",
          "context" : {
-            "taskId" : taskAndPoker.task.id
+            "taskId" : taskAndRepo.taskId,
+            "repository" : taskAndRepo.repository
          }
       });
 
@@ -17,6 +18,7 @@ define([ "message-bus", "websocket-bus", "ui-values" ], function(bus, wsbus, uiV
    bus.listen("associate-issue-show-issue-list", function(e, message) {
       var data = message.response;
       var taskId = message.context.taskId;
+      var repository = message.context.repository;
       bus.send("ui-element:create", {
          "div" : dialogDOMId,
          "parentDiv" : null,
@@ -43,6 +45,7 @@ define([ "message-bus", "websocket-bus", "ui-values" ], function(bus, wsbus, uiV
             wsbus.send("associate-task-issue", {
                "taskId" : taskId,
                "issueNumbers" : issueNumbers,
+               "repository" : repository,
                "developerName" : userName
             });
          },

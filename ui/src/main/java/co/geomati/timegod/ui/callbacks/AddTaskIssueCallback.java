@@ -33,14 +33,15 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 		String issueName = updateTaskMessage.get("title").getAsString();
 		EntityManager em = DBUtils.getEntityManager();
 		Task task = em.find(Task.class, taskId);
-		String issueRepository = task.getPoker().getAPIRepository() + "issues";
+		String repository = updateTaskMessage.get("repository").getAsString();
+		String issuesURL = getIssuesURL(repository);
 		String user = System.getenv("TIMEGOD_GITHUB_API_USER");
 		String password = System.getenv("TIMEGOD_GITHUB_API_PASSWORD");
 		String encoding = new String(
 				Base64.encodeBase64((user + ":" + password).getBytes()));
-		PostMethod post = new PostMethod(issueRepository);
+		PostMethod post = new PostMethod(issuesURL);
 		post.addRequestHeader("Authorization", "Basic " + encoding);
-		int issueNumber = -1;
+		String issueString = null;
 		try {
 			RequestEntity requestEntity = new StringRequestEntity(
 					"{\"title\":\"" + issueName + "\"}", "application/json",
@@ -52,7 +53,8 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 				String response = post.getResponseBodyAsString();
 				JsonObject jsonResponse = (JsonObject) new JsonParser()
 						.parse(response);
-				issueNumber = jsonResponse.get("number").getAsInt();
+				issueString = repository
+						+ jsonResponse.get("number").getAsInt();
 			} else {
 				throw new CallbackException("Cannot add the issue: " + status);
 			}
@@ -65,18 +67,23 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 		}
 
 		em.getTransaction().begin();
-		int[] issues = task.getIssues();
-		issues = issues != null ? issues : new int[0];
+		String[] issues = task.getIssues();
+		issues = issues != null ? issues : new String[0];
 		issues = Arrays.copyOf(issues, issues.length + 1);
-		issues[issues.length - 1] = issueNumber;
+		issues[issues.length - 1] = issueString;
 		task.setIssues(issues);
 		em.getTransaction().commit();
 
 		log(eventName, payload,
-				new Memento(taskId, task.getName(), issueNumber));
+				new Memento(taskId, task.getName(), issueString));
 
 		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
 				task.getPoker().getName(), task)));
+	}
+
+	private String getIssuesURL(String repo) {
+		return "https://api.github.com/repos/"
+				+ repo.substring(repo.indexOf('/') + 1) + "issues";
 	}
 
 	public String getEventName() {
@@ -91,21 +98,21 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 	public class Memento {
 		private long taskId;
 		private String taskName;
-		private int issueNumber;
+		private String issueString;
 
 		public Memento() {
 		}
 
-		public Memento(long taskId, String taskName, int issueNumber) {
+		public Memento(long taskId, String taskName, String issueString) {
 			super();
 			this.taskId = taskId;
 			this.taskName = taskName;
-			this.issueNumber = issueNumber;
+			this.issueString = issueString;
 		}
 
 		@Override
 		public String toString() {
-			return "Añadida issue " + issueNumber + " a la tarea " + taskName;
+			return "Añadida issue " + issueString + " a la tarea " + taskName;
 		}
 	}
 }

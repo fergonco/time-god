@@ -21,15 +21,15 @@ public class DissociateTaskIssueCallback extends AbstractLoggingCallback
 			String eventName, JsonElement payload) throws CallbackException {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
-		int issueNumber = updateTaskMessage.get("issueNumber").getAsInt();
+		String issueURL = updateTaskMessage.get("issueURL").getAsString();
 		EntityManager em = DBUtils.getEntityManager();
 		Task task = em.find(Task.class, taskId);
 
 		em.getTransaction().begin();
-		int[] issues = task.getIssues();
+		String[] issues = task.getIssues();
 		if (issues != null && issues.length > 0) {
 			for (int i = 0; i < issues.length; i++) {
-				if (issues[i] == issueNumber) {
+				if (issues[i].equals(issueURL)) {
 					for (; i < issues.length - 1; i++) {
 						issues[i] = issues[i + 1];
 					}
@@ -40,8 +40,7 @@ public class DissociateTaskIssueCallback extends AbstractLoggingCallback
 		task.setIssues(issues);
 		em.getTransaction().commit();
 
-		log(eventName, payload,
-				new Memento(taskId, task.getName(), issueNumber));
+		log(eventName, payload, new Memento(taskId, task.getName(), issueURL));
 
 		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
 				task.getPoker().getName(), task)));
@@ -59,22 +58,21 @@ public class DissociateTaskIssueCallback extends AbstractLoggingCallback
 	public class Memento {
 		private long taskId;
 		private String taskName;
-		private int issueNumber;
+		private String issueURL;
 
 		public Memento() {
 		}
 
-		public Memento(long taskId, String taskName, int issueNumber) {
+		public Memento(long taskId, String taskName, String issueURL) {
 			super();
 			this.taskId = taskId;
 			this.taskName = taskName;
-			this.issueNumber = issueNumber;
+			this.issueURL = issueURL;
 		}
 
 		@Override
 		public String toString() {
-			return "Desasociada issue " + issueNumber + " a la tarea "
-					+ taskName;
+			return "Desasociada issue " + issueURL + " a la tarea " + taskName;
 		}
 	}
 }

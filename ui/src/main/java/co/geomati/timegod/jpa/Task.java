@@ -19,7 +19,7 @@ public class Task {
 
 	private String[] keywords;
 
-	private int[] issues;
+	private String[] issues;
 
 	private long creationTime;
 
@@ -99,11 +99,11 @@ public class Task {
 		return creationTime;
 	}
 
-	public int[] getIssues() {
+	public String[] getIssues() {
 		return issues;
 	}
 
-	public void setIssues(int[] issues) {
+	public void setIssues(String[] issues) {
 		this.issues = issues;
 	}
 }

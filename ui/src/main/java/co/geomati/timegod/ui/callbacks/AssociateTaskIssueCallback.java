@@ -25,21 +25,26 @@ public class AssociateTaskIssueCallback extends AbstractLoggingCallback
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		int[] issueNumbers = GSON.fromJson(updateTaskMessage
 				.get("issueNumbers").getAsJsonArray(), int[].class);
+		String repository = updateTaskMessage.get("repository").getAsString();
+		String[] issueURLs = new String[issueNumbers.length];
+		for (int i = 0; i < issueURLs.length; i++) {
+			issueURLs[i] = repository + issueNumbers[i];
+		}
 		EntityManager em = DBUtils.getEntityManager();
 		Task task = em.find(Task.class, taskId);
 
 		em.getTransaction().begin();
-		int[] issues = task.getIssues() != null ? task.getIssues() : new int[0];
+		String[] issues = task.getIssues() != null ? task.getIssues()
+				: new String[0];
 		int newIssueIndex = issues.length;
 		issues = Arrays.copyOf(issues, issues.length + issueNumbers.length);
 		for (int i = newIssueIndex; i < newIssueIndex + issueNumbers.length; i++) {
-			issues[i] = issueNumbers[i - newIssueIndex];
+			issues[i] = issueURLs[i - newIssueIndex];
 		}
 		task.setIssues(issues);
 		em.getTransaction().commit();
 
-		log(eventName, payload, new Memento(taskId, task.getName(),
-				issueNumbers));
+		log(eventName, payload, new Memento(taskId, task.getName(), issueURLs));
 
 		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
 				task.getPoker().getName(), task)));
@@ -57,22 +62,22 @@ public class AssociateTaskIssueCallback extends AbstractLoggingCallback
 	public class Memento {
 		private long taskId;
 		private String taskName;
-		private int[] issueNumbers;
+		private String[] issueURLs;
 
 		public Memento() {
 		}
 
-		public Memento(long taskId, String taskName, int[] issueNumbers) {
+		public Memento(long taskId, String taskName, String[] issueURLs) {
 			super();
 			this.taskId = taskId;
 			this.taskName = taskName;
-			this.issueNumbers = issueNumbers;
+			this.issueURLs = issueURLs;
 		}
 
 		@Override
 		public String toString() {
 			return "Asociadas las issues "
-					+ StringUtils.join(Arrays.asList(issueNumbers), ",")
+					+ StringUtils.join(Arrays.asList(issueURLs), ",")
 					+ " a la tarea " + taskName;
 		}
 	}
