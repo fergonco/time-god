@@ -316,7 +316,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       .each(function(d) {
          bus.send("ui-button:create", {
             "element" : this,
-            "text" : "Asociar issue",
+            "text" : "Asociar issue GitHub",
             "sendEventName" : "btn-associate-issue",
             "sendEventMessage" : d
          });
@@ -326,7 +326,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
       .each(function(d) {
          bus.send("ui-button:create", {
             "element" : this,
-            "text" : "Crear issue",
+            "text" : "Crear issue GitHub",
             "sendEventName" : "create-issue",
             "sendEventMessage" : d
          });
@@ -380,21 +380,25 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
                "taskAndIssue" : taskAndIssue
             }
          });
-         bus.send("ui-button:create", {
-            "div" : issueDOMId + "-btnRemove",
-            "parentDiv" : issueDOMId,
-            "image" : "modules/remove.png",
-            "sendEventName" : "dissociate-issue",
-            "sendEventMessage" : taskAndIssue
-         });
-         bus.send("ui-attr", {
-            "div" : issueDOMId + "-btnRemove",
-            "attribute" : "title",
-            "value" : "Eliminar asociación issue"
-         });
+         addDissociateButtons(issueDOMId, taskAndIssue);
       });
 
    });
+
+   function addDissociateButtons(issueDOMId, taskAndIssue) {
+      bus.send("ui-button:create", {
+         "div" : issueDOMId + "-btnRemove",
+         "parentDiv" : issueDOMId,
+         "image" : "modules/remove.png",
+         "sendEventName" : "dissociate-issue",
+         "sendEventMessage" : taskAndIssue
+      });
+      bus.send("ui-attr", {
+         "div" : issueDOMId + "-btnRemove",
+         "attribute" : "title",
+         "value" : "Eliminar asociación issue"
+      });
+   }
 
    bus.listen("render-issue", function(e, message) {
       var data = message.response;
@@ -460,6 +464,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "mark
          "div" : issueDOMId + "-a",
          "html" : data.title
       });
+      addDissociateButtons(issueDOMId, taskAndIssue);
    });
 
    bus.listen("show-wiki", function(e, taskName) {
