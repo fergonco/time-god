@@ -10,3 +10,9 @@
 #poker-configuration input {
 	width: 75%;
 }
+
+#repo-list-container {
+    border: 1px solid;
+    margin: 20px;
+    overflow: hidden;
+}

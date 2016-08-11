@@ -3,18 +3,36 @@ define([ "message-bus", "websocket-bus", "ui-values", "editableList" ], function
    var userName = null;
 
    bus.listen("configure-poker", function(e, poker) {
-      var issueRepositories = poker.issueRepositories ? poker.issueRepositories : [];
+      var issueRepositories = poker.issueRepositories ? poker.issueRepositories.slice(0) : [];
       var pokerConfigurationId = "poker-configuration";
       bus.send("ui-element:create", {
          "div" : pokerConfigurationId,
          "parentDiv" : null,
          "type" : "div"
       });
+      
+      bus.send("ui-element:create", {
+         "type" : "div",
+         "div": "repo-list-span",
+         "parentDiv" : pokerConfigurationId,
+      });
+      bus.send("ui-set-content", {
+         "div": "repo-list-span",
+         "html" : "Lista de repositorios",
+      });
+      
+      var repoListContainerId = "repo-list-container";
+      bus.send("ui-element:create", {
+         "type" : "div",
+         "div" : repoListContainerId,
+         "parentDiv" : pokerConfigurationId,
+      });
+      
       var githubRepositoriesId = "github-repositories";
       bus.send("ui-element:create", {
          "type" : "div",
          "div" : githubRepositoriesId,
-         "parentDiv" : pokerConfigurationId,
+         "parentDiv" : repoListContainerId,
       });
 
       var list = editableList.create(githubRepositoriesId);
