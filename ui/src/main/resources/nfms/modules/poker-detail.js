@@ -468,10 +468,15 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       addDissociateButtons(issueDOMId, taskAndIssue);
    });
 
-   bus.listen("show-wiki", function(e, taskName) {
-      window.open("https://github.com/michogar/fao-workplan/blob/master/" + latinize.toId(pokerName) + "/"
-         + latinize.toId(taskName) + ".md", "_blank");
-   });
+   bus.listen("show-wiki",
+      function(e, taskName) {
+         if (!poker.wikiRepository) {
+            bus.send("info", "No hay repositorio wiki configurado");
+         } else {
+            window.open(poker.wikiRepository + latinize.toId(pokerName) + "/" + latinize.toId(taskName) + ".md",
+               "_blank");
+         }
+      });
 
    function getRepository(callback) {
       if (!poker.issueRepositories || poker.issueRepositories.length == 0) {
