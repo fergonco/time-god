@@ -7,3 +7,12 @@
 	background-color: blue;
 	color: white;
 }
+
+.taxonomy-item {
+	border: 1px solid;
+	margin: 4px;
+}
+
+.keyword {
+	list-style: inside;
+}

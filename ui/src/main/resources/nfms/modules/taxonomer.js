@@ -27,7 +27,12 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
 
       bus.send("ui-element:create", {
          "div" : "taxonomy-keywords",
-         "parentDiv" : taxonomerId
+         "parentDiv" : taxonomerId,
+         "type" : "div"
+      });
+      bus.send("ui-set-content", {
+         "div" : "taxonomy-keywords",
+         "html" : "Keywords:"
       });
       bus.send("ui-element:create", {
          "div" : "taxonomy-title",
