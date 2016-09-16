@@ -10,6 +10,16 @@
 	margin: 0px 20px;
 }
 
+.editableListEntry.closed-task {
+	opacity: 0.25;
+}
+
+.editableListEntry.cancelled-task {
+    background: red none repeat scroll 0 0;
+    opacity: 0.25;
+    text-decoration: line-through;
+}
+    
 .editableListEntry ul {
 	margin-top: 4px;
 	margin-bottom: 0px;

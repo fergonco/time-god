@@ -30,21 +30,19 @@ import co.geomati.timegod.ui.callbacks.RemovePokerCallback;
 import co.geomati.timegod.ui.callbacks.RemoveTaskCallback;
 import co.geomati.timegod.ui.callbacks.ReportTaskTimesCallback;
 import co.geomati.timegod.ui.callbacks.SetPokerEventCallback;
+import co.geomati.timegod.ui.callbacks.ToggleTaskStatusCallback;
 import co.geomati.websocketBus.WebsocketBus;
 
 @WebListener
 public class SaveAndBroadcast implements ServletContextListener {
 
-	private static final LoggingCallback[] loggingCallbacks = new LoggingCallback[] {
-			new AddPokerCallback(), new ChangePokerKeywordsCallback(),
-			new ChangePokerRepositoryConfigurationCallback(),
-			new ChangePokerTotalCreditsCallback(), new RemovePokerCallback(),
-			new AddTaskCallback(), new RemoveTaskCallback(),
-			new ChangeTaskNameCallback(), new ChangeTaskUserCreditsCallback(),
-			new ChangeTaskCommonCreditsCallback(),
-			new ChangeTaskKeywordsCallback(), new ReportTaskTimesCallback(),
-			new AddTaskIssueCallback(), new DissociateTaskIssueCallback(),
-			new AssociateTaskIssueCallback(), new SetPokerEventCallback() };
+	private static final LoggingCallback[] loggingCallbacks = new LoggingCallback[] { new AddPokerCallback(),
+			new ChangePokerKeywordsCallback(), new ChangePokerRepositoryConfigurationCallback(),
+			new ChangePokerTotalCreditsCallback(), new RemovePokerCallback(), new AddTaskCallback(),
+			new RemoveTaskCallback(), new ChangeTaskNameCallback(), new ToggleTaskStatusCallback(),
+			new ChangeTaskUserCreditsCallback(), new ChangeTaskCommonCreditsCallback(),
+			new ChangeTaskKeywordsCallback(), new ReportTaskTimesCallback(), new AddTaskIssueCallback(),
+			new DissociateTaskIssueCallback(), new AssociateTaskIssueCallback(), new SetPokerEventCallback() };
 
 	public void contextInitialized(ServletContextEvent sce) {
 		WebsocketBus bus = WebsocketBus.INSTANCE;
@@ -60,12 +58,10 @@ public class SaveAndBroadcast implements ServletContextListener {
 		HashMap<String, LoggingCallback> loggingCallbackRegistry = new HashMap<String, LoggingCallback>();
 		for (LoggingCallback loggingCallback : loggingCallbacks) {
 			bus.addListener(loggingCallback.getEventName(), loggingCallback);
-			loggingCallbackRegistry.put(loggingCallback.getEventName(),
-					loggingCallback);
+			loggingCallbackRegistry.put(loggingCallback.getEventName(), loggingCallback);
 		}
 
-		sce.getServletContext().setAttribute("logging-call-back-registry",
-				loggingCallbackRegistry);
+		sce.getServletContext().setAttribute("logging-call-back-registry", loggingCallbackRegistry);
 
 	}
 

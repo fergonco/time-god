@@ -204,16 +204,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
    views[PROGRESS] = function(selection) {
 
       selection//
-      .append("progress")//
-      .attr("title", function(task) {
-         return getTotalTime(task) + " de " + task.commonEstimation;
-      })//
-      .attr("max", "100")//
-      .attr("value", function(task) {
-         var acum = getTotalTime(task);
-         return 100 * acum / task.commonEstimation;
-      });
-      selection//
       .append("span")//
       .each(function(d) {
          bus.send("ui-button:create", {
@@ -223,7 +213,26 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
             "sendEventMessage" : d
          });
       });
-
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : d.status == 0 ? "Cerrar" : d.status == 1 ? "Cancelar" : "Reabrir",
+            "sendEventName" : "toggle-task-status",
+            "sendEventMessage" : d
+         });
+      });
+      selection//
+      .append("progress")//
+      .attr("title", function(task) {
+         return getTotalTime(task) + " de " + task.commonEstimation;
+      })//
+      .attr("max", "100")//
+      .attr("value", function(task) {
+         var acum = getTotalTime(task);
+         return 100 * acum / task.commonEstimation;
+      });
    }
    function getTotalTime(task) {
       var acum = 0;
@@ -235,6 +244,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       }
       return acum / (1000 * 60 * 60);
    }
+
+   bus.listen("toggle-task-status", function(e, task) {
+      wsbus.send("toggle-task-status", {
+         "taskId" : task.id,
+         "developerName" : userName
+      });
+   });
 
    bus.send("ui-choice-field:create", {
       "div" : "task-view-choice",
@@ -288,6 +304,17 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
    });
 
    list.postProcess(function(selection) {
+
+      selection//
+      .classed("open-task", function(d) {
+         return d.status == 0;
+      })//
+      .classed("closed-task", function(d) {
+         return d.status == 1;
+      })//
+      .classed("cancelled-task", function(d) {
+         return d.status == 2;
+      })//
 
       selection//
       .append("span")//

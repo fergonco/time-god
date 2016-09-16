@@ -21,6 +21,11 @@ public class Task {
 
 	private String[] issues;
 
+	/**
+	 * 0 open, 1 closed, 2 cancelled
+	 */
+	private int status = 0;
+
 	private long creationTime;
 
 	@OneToMany
@@ -105,5 +110,13 @@ public class Task {
 
 	public void setIssues(String[] issues) {
 		this.issues = issues;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 }
