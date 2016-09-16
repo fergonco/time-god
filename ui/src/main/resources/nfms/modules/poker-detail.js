@@ -129,6 +129,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
 
    var INDIVIDUAL = "individual";
    var COMMON = "common";
+   var ISSUES = "issues";
    var PROGRESS = "progress";
    var views = {};
    views[INDIVIDUAL] = function(selection) {
@@ -153,6 +154,17 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       selection//
       .append("span")//
       .html("Your estimation:");
+
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Renombrar",
+            "sendEventName" : "rename-task",
+            "sendEventMessage" : d
+         });
+      });
    }
 
    views[COMMON] = function(selection) {
@@ -201,6 +213,86 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       .html("Valoración común:");
    }
 
+   views[ISSUES] = function(selection) {
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : d.status == 0 ? "Cerrar" : d.status == 1 ? "Cancelar" : "Reabrir",
+            "sendEventName" : "toggle-task-status",
+            "sendEventMessage" : d
+         });
+      });
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Asociar issue GitHub",
+            "sendEventName" : "btn-associate-issue",
+            "sendEventMessage" : d
+         });
+      });
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Crear issue GitHub",
+            "sendEventName" : "create-issue",
+            "sendEventMessage" : d
+         });
+      });
+
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : "Wiki",
+            "sendEventName" : "show-wiki",
+            "sendEventMessage" : d.name
+         });
+      });
+      var issueSelection = selection.append("ul").selectAll(".issue").data(function(task) {
+         var issues = task.issues ? task.issues : [];
+         var ret = [];
+         for (var i = 0; i < issues.length; i++) {
+            ret.push({
+               "task" : task,
+               "issueURL" : issues[i]
+            });
+         }
+
+         return ret;
+      });
+      function getIssueElementId(taskAndIssue, issueIndex) {
+         return "task-" + taskAndIssue.task.id + "-issue-" + issueIndex
+      }
+      issueSelection.exit().remove();
+      issueSelection.enter().append("li")//
+      .attr("id", function(taskAndIssue, index) {
+         return getIssueElementId(taskAndIssue, index);
+      })//
+      .attr("class", "issue")//
+      .html(function(taskAndIssue) {
+         return issues.issue(taskAndIssue.issueURL).getWebLink();
+      })//
+      .each(function(taskAndIssue, index) {
+         var issueDOMId = getIssueElementId(taskAndIssue, index);
+         wsbus.send("proxy", {
+            "url" : issues.issue(taskAndIssue.issueURL).getAPILink(),
+            "event-name" : "render-issue",
+            "context" : {
+               "id" : issueDOMId,
+               "taskAndIssue" : taskAndIssue
+            }
+         });
+         addDissociateButtons(issueDOMId, taskAndIssue);
+      });
+   }
+
    views[PROGRESS] = function(selection) {
 
       selection//
@@ -210,16 +302,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
             "element" : this,
             "text" : "Reporte horas",
             "sendEventName" : "report-time",
-            "sendEventMessage" : d
-         });
-      });
-      selection//
-      .append("span")//
-      .each(function(d) {
-         bus.send("ui-button:create", {
-            "element" : this,
-            "text" : d.status == 0 ? "Cerrar" : d.status == 1 ? "Cancelar" : "Reabrir",
-            "sendEventName" : "toggle-task-status",
             "sendEventMessage" : d
          });
       });
@@ -261,6 +343,9 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       }, {
          "text" : "puesta en común",
          "value" : COMMON
+      }, {
+         "text" : "Ejecución",
+         "value" : ISSUES
       }, {
          "text" : "progreso del proyecto",
          "value" : PROGRESS
@@ -315,50 +400,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       .classed("cancelled-task", function(d) {
          return d.status == 2;
       })//
-
-      selection//
-      .append("span")//
-      .each(function(d) {
-         bus.send("ui-button:create", {
-            "element" : this,
-            "text" : "Renombrar",
-            "sendEventName" : "rename-task",
-            "sendEventMessage" : d
-         });
-      });
-
-      selection//
-      .append("span")//
-      .each(function(d) {
-         bus.send("ui-button:create", {
-            "element" : this,
-            "text" : "Wiki",
-            "sendEventName" : "show-wiki",
-            "sendEventMessage" : d.name
-         });
-      });
-
-      selection//
-      .append("span")//
-      .each(function(d) {
-         bus.send("ui-button:create", {
-            "element" : this,
-            "text" : "Asociar issue GitHub",
-            "sendEventName" : "btn-associate-issue",
-            "sendEventMessage" : d
-         });
-      });
-      selection//
-      .append("span")//
-      .each(function(d) {
-         bus.send("ui-button:create", {
-            "element" : this,
-            "text" : "Crear issue GitHub",
-            "sendEventName" : "create-issue",
-            "sendEventMessage" : d
-         });
-      });
-
+      
       currentView(selection);
 
       selection.attr("title", function(t) {
@@ -371,43 +413,6 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
             ret = ret.substring(0, ret.length - 1);
          }
          return ret + " | creationDate: " + new Date(t.creationTime);
-      });
-
-      var issueSelection = selection.append("ul").selectAll(".issue").data(function(task) {
-         var issues = task.issues ? task.issues : [];
-         var ret = [];
-         for (var i = 0; i < issues.length; i++) {
-            ret.push({
-               "task" : task,
-               "issueURL" : issues[i]
-            });
-         }
-
-         return ret;
-      });
-      function getIssueElementId(taskAndIssue, issueIndex) {
-         return "task-" + taskAndIssue.task.id + "-issue-" + issueIndex
-      }
-      issueSelection.exit().remove();
-      issueSelection.enter().append("li")//
-      .attr("id", function(taskAndIssue, index) {
-         return getIssueElementId(taskAndIssue, index);
-      })//
-      .attr("class", "issue")//
-      .html(function(taskAndIssue) {
-         return issues.issue(taskAndIssue.issueURL).getWebLink();
-      })//
-      .each(function(taskAndIssue, index) {
-         var issueDOMId = getIssueElementId(taskAndIssue, index);
-         wsbus.send("proxy", {
-            "url" : issues.issue(taskAndIssue.issueURL).getAPILink(),
-            "event-name" : "render-issue",
-            "context" : {
-               "id" : issueDOMId,
-               "taskAndIssue" : taskAndIssue
-            }
-         });
-         addDissociateButtons(issueDOMId, taskAndIssue);
       });
 
    });
@@ -638,10 +643,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
                      "value" : COMMON
                   });
                } else {
-                  currentView = views[PROGRESS];
+                  currentView = views[ISSUES];
                   bus.send("ui-radio-field:select", {
                      "div" : "task-view-choice",
-                     "value" : PROGRESS
+                     "value" : ISSUES
                   });
                }
             }
