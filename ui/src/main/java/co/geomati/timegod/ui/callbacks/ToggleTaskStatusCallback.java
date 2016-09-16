@@ -5,6 +5,7 @@ import javax.persistence.EntityManager;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import co.geomati.timegod.jpa.Poker;
 import co.geomati.timegod.jpa.Task;
 import co.geomati.timegod.ui.DBUtils;
 import co.geomati.websocketBus.Callback;
@@ -22,10 +23,12 @@ public class ToggleTaskStatusCallback extends AbstractLoggingCallback implements
 		em.getTransaction().begin();
 		task.setStatus((status + 1) % 3);
 		em.getTransaction().commit();
-
 		log(eventName, payload, new Memento(taskId, task.getStatus()));
 
-		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(task.getPoker().getName(), task)));
+		// update poker since order may change
+		Poker poker = task.getPoker();
+		em.refresh(poker);
+		bus.broadcast("updated-poker", GSON.toJsonTree(poker));
 	}
 
 	public String getEventName() {

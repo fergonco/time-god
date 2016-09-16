@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 @Entity
 public class Poker {
@@ -13,6 +14,7 @@ public class Poker {
 	private String name;
 
 	@OneToMany(mappedBy = "poker")
+	@OrderBy("status ASC")
 	private ArrayList<Task> tasks;
 
 	@OneToMany(mappedBy = "poker")
