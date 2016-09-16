@@ -252,7 +252,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       });
    });
 
-   bus.send("ui-choice-field:create", {
+   bus.send("ui-radio-field:create", {
       "div" : "task-view-choice",
       "parentDiv" : pokerDetailId,
       "values" : [ {
@@ -627,10 +627,22 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
             if (currentView == null) {
                if (!estimations(poker.tasks)) {
                   currentView = views[INDIVIDUAL];
+                  bus.send("ui-radio-field:select", {
+                     "div" : "task-view-choice",
+                     "value" : INDIVIDUAL
+                  });
                } else if (!commonEstimation(poker.tasks)) {
                   currentView = views[COMMON];
+                  bus.send("ui-radio-field:select", {
+                     "div" : "task-view-choice",
+                     "value" : COMMON
+                  });
                } else {
                   currentView = views[PROGRESS];
+                  bus.send("ui-radio-field:select", {
+                     "div" : "task-view-choice",
+                     "value" : PROGRESS
+                  });
                }
             }
             list.refresh(poker.tasks);

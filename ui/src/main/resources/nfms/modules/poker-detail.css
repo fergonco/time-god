@@ -2,6 +2,10 @@
 	max-width: 90vw;
 }
 
+#task-view-choice {
+	border-bottom: 1px solid black;
+}
+
 .task-entry span, .task-entry input {
 	float: right;
 }
@@ -15,11 +19,11 @@
 }
 
 .editableListEntry.cancelled-task {
-    background: red none repeat scroll 0 0;
-    opacity: 0.25;
-    text-decoration: line-through;
+	background: red none repeat scroll 0 0;
+	opacity: 0.25;
+	text-decoration: line-through;
 }
-    
+
 .editableListEntry ul {
 	margin-top: 4px;
 	margin-bottom: 0px;
