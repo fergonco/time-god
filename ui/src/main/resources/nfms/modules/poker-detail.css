@@ -12,6 +12,8 @@
 
 .task-entry>progress {
 	margin: 0px 20px;
+	float: right;
+	width: 30vw;
 }
 
 .editableListEntry.closed-task {
