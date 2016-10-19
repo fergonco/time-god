@@ -369,7 +369,8 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
             "name" : text,
             "estimations" : {},
             "creationTime" : new Date().getTime(),
-            "commonEstimation" : null
+            "commonEstimation" : null,
+            "status" : 0
          }
       });
    });
@@ -400,7 +401,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       .classed("cancelled-task", function(d) {
          return d.status == 2;
       })//
-      
+
       currentView(selection);
 
       selection.attr("title", function(t) {

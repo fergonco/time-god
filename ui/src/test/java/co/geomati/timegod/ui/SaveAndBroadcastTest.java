@@ -131,6 +131,7 @@ public class SaveAndBroadcastTest {
 		JsonObject taskMessage = (JsonObject) parse("{\"pokerName\":\"fua\", \"developerName\" : 'pumukl', task:{\"name\" : \"t1\","
 				+ "\"estimations\" : {},"
 				+ "\"creationTime\" : 82734628,"
+				+ "\"status\" : 0,"
 				+ "\"commonEstimation\" : null}}");
 		callback.messageReceived(mock(Caller.class), bus, "eventName",
 				taskMessage);

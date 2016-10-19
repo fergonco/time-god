@@ -43,7 +43,7 @@ public class TaskMapping implements JsonSerializer<Task>, JsonDeserializer<Task>
 		ArrayList<Estimation> estimations = new ArrayList<Estimation>();
 		t.setEstimations(estimations);
 		t.setIssues(DEFAULT_GSON.fromJson(jsonTask.get("issues"), String[].class));
-		t.setStatus(jsonTask.get("status").getAsInt());
+		t.setStatus(getAsInteger(jsonTask.get("status")));
 
 		JsonObject jsonEstimations = jsonTask.get("estimations").getAsJsonObject();
 		Set<Entry<String, JsonElement>> entries = jsonEstimations.entrySet();
