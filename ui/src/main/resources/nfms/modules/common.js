@@ -1,6 +1,8 @@
-define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latinize) {
+define([ "message-bus", "websocket-bus", "ui-values", "latinize" ], function(bus, wsbus, uiValues, latinize) {
 
+   var userName = null;
    var dlgAskPokersId = "dlg-ask-pokers";
+   var pokers = [];
 
    bus.listen("modules-loaded", function() {
       bus.send("show-window", [ "developers" ]);
@@ -12,11 +14,13 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
          "html" : "No identificado"
       });
 
-      bus.listen("set-user", function(e, userName) {
+      bus.listen("set-user", function(e, newUserName) {
+         userName = newUserName;
          bus.send("ui-set-content", [ {
             "div" : "lblUserName",
-            "html" : "Hola " + userName
+            "html" : "Hola " + newUserName
          } ]);
+         bus.send("ui-show", "btn-removeTimeReport");
       });
 
       bus.send("ui-button:create", {
@@ -25,6 +29,14 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
          "text" : "Informe reportes de tiempo",
          "sendEventName" : "show-time-report"
       });
+
+      bus.send("ui-button:create", {
+         "div" : "btn-removeTimeReport",
+         "parentDiv" : null,
+         "text" : "Eliminar informe de tiempo",
+         "sendEventName" : "remove-time-report"
+      });
+      bus.send("ui-hide", "btn-removeTimeReport");
    });
 
    bus.listen("ui-update-poker-list", function(e, newPokers) {
@@ -70,7 +82,7 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
             "type" : "checkbox",
             "text" : poker.name
          });
-         uiValues.set(chkPokerId, true);
+         uiValues.set(chkPokerId, false);
       }
 
       bus.send("ui-button:create", {
@@ -85,6 +97,20 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
          "text" : "Cancelar",
          "sendEventName" : "dlg-ask-pokers-cancel"
       });
+   });
+
+   bus.listen("remove-time-report", function(e, message) {
+      bus.send("jsdialogs.question", [ {
+         "message" : "Introduce el código a eliminar",
+         "okAction" : function(value) {
+            if (value.trim().length > 0) {
+               wsbus.send("remove-time-report", {
+                  "id" : value.trim(),
+                  "developerName" : userName
+               });
+            }
+         }
+      } ]);
    });
 
    bus.listen("show-time-report-for-pokers", function(e) {
@@ -105,6 +131,7 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
             for (var k = 0; k < task.timeSegments.length; k++) {
                var timeSegment = task.timeSegments[k];
                timeSegments.push({
+                  "id" : timeSegment.id,
                   "start" : timeSegment.start,
                   "end" : timeSegment.end,
                   "task" : task,
@@ -149,6 +176,7 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
          wiki += "\t" + developerName;
          wiki += "\t" + timeSegments[i].poker.name;
          wiki += "\t" + timeSegments[i].task.name;
+         wiki += "(" + timeSegments[i].id + ")";
          wiki += "\n";
       }
       wiki += getDeveloperTimes(developerAccum);

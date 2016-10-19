@@ -35,4 +35,7 @@ public class TimeSegment {
 		this.developer = developer;
 	}
 
+	public long getId() {
+		return id;
+	}
 }
