@@ -1,5 +1,14 @@
 define([], function() {
 
+   /*
+    * Technically a valid ID, points have to be escaped in order to be matched
+    */
+   function toIdNoPoints(input) {
+      input = toId(input);
+      input = input.replace(/\./g, "_");
+      return input;
+   }
+
    function toId(input) {
       input = latinize(input);
       input = input.replace(/\s/g, "_");
@@ -29,6 +38,7 @@ define([], function() {
 
    return {
       "latinize" : latinize,
-      "toId" : toId
+      "toId" : toId,
+      "toIdNoPoints" : toIdNoPoints
    }
 });

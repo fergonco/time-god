@@ -63,7 +63,7 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
       });
       for (var i = 0; i < pokers.length; i++) {
          var poker = pokers[i];
-         var chkPokerId = "chkPoker" + latinize.toId(poker.name);
+         var chkPokerId = "chkPoker" + latinize.toIdNoPoints(poker.name);
          bus.send("ui-input-field:create", {
             "div" : chkPokerId,
             "parentDiv" : dlgAskPokersId,
@@ -91,7 +91,7 @@ define([ "message-bus", "ui-values", "latinize" ], function(bus, uiValues, latin
       var selectedPokers = [];
       for (var i = 0; i < pokers.length; i++) {
          var poker = pokers[i];
-         if (uiValues.get("chkPoker" + latinize.toId(poker.name))) {
+         if (uiValues.get("chkPoker" + latinize.toIdNoPoints(poker.name))) {
             selectedPokers.push(poker);
          }
       }
