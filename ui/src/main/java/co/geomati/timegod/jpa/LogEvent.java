@@ -3,6 +3,7 @@ package co.geomati.timegod.jpa;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -19,6 +20,7 @@ public class LogEvent {
 
 	private String eventName;
 
+	@Lob
 	private String payload;
 
 	public long getId() {

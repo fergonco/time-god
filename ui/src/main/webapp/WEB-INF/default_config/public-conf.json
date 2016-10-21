@@ -1,0 +1,10 @@
+{
+	"auth" : {
+		"auth" : {
+			"button" : {
+				"div" : "auth-button",
+				"parentDiv" : "developer-list"
+			}
+		}
+	}
+}

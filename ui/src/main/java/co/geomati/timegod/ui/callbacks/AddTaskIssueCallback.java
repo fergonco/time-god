@@ -1,16 +1,23 @@
 package co.geomati.timegod.ui.callbacks;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import javax.persistence.EntityManager;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import co.geomati.timegod.jpa.Task;
 import co.geomati.timegod.ui.DBUtils;
@@ -19,15 +26,10 @@ import co.geomati.websocketBus.CallbackException;
 import co.geomati.websocketBus.Caller;
 import co.geomati.websocketBus.WebsocketBus;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+public class AddTaskIssueCallback extends AbstractLoggingCallback implements Callback, LoggingCallback {
 
-public class AddTaskIssueCallback extends AbstractLoggingCallback implements
-		Callback, LoggingCallback {
-
-	public void messageReceived(Caller caller, WebsocketBus bus,
-			String eventName, JsonElement payload) throws CallbackException {
+	public void messageReceived(Caller caller, WebsocketBus bus, String eventName, JsonElement payload)
+			throws CallbackException {
 		JsonObject updateTaskMessage = payload.getAsJsonObject();
 		long taskId = updateTaskMessage.get("taskId").getAsLong();
 		String issueName = updateTaskMessage.get("title").getAsString();
@@ -37,29 +39,26 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 		String issuesURL = getIssuesURL(repository);
 		String user = System.getenv("TIMEGOD_GITHUB_API_USER");
 		String password = System.getenv("TIMEGOD_GITHUB_API_PASSWORD");
-		String encoding = new String(
-				Base64.encodeBase64((user + ":" + password).getBytes()));
-		PostMethod post = new PostMethod(issuesURL);
-		post.addRequestHeader("Authorization", "Basic " + encoding);
+		String encoding = new String(Base64.encodeBase64((user + ":" + password).getBytes()));
+		HttpPost post = new HttpPost(issuesURL);
+		post.addHeader("Authorization", "Basic " + encoding);
 		String issueString = null;
 		try {
-			RequestEntity requestEntity = new StringRequestEntity(
-					"{\"title\":\"" + issueName + "\"}", "application/json",
-					"utf-8");
-			post.setRequestEntity(requestEntity);
-			HttpClient client = new HttpClient();
-			int status = client.executeMethod(post);
+			StringEntity requestEntity = new StringEntity("{\"title\":\"" + issueName + "\"}",
+					ContentType.APPLICATION_JSON);
+			post.setEntity(requestEntity);
+			HttpClient client = HttpClientBuilder.create().build();
+			HttpResponse response = client.execute(post);
+			int status = response.getStatusLine().getStatusCode();
 			if (status == 201) {
-				String response = post.getResponseBodyAsString();
-				JsonObject jsonResponse = (JsonObject) new JsonParser()
-						.parse(response);
-				issueString = repository
-						+ jsonResponse.get("number").getAsInt();
+				InputStream responseStream = response.getEntity().getContent();
+				String body = IOUtils.toString(responseStream);
+				responseStream.close();
+				JsonObject jsonResponse = (JsonObject) new JsonParser().parse(body);
+				issueString = repository + jsonResponse.get("number").getAsInt();
 			} else {
 				throw new CallbackException("Cannot add the issue: " + status);
 			}
-		} catch (HttpException e) {
-			throw new CallbackException("Cannot add the issue", e);
 		} catch (IOException e) {
 			throw new CallbackException("Cannot add the issue", e);
 		} finally {
@@ -74,16 +73,13 @@ public class AddTaskIssueCallback extends AbstractLoggingCallback implements
 		task.setIssues(issues);
 		em.getTransaction().commit();
 
-		log(eventName, payload,
-				new Memento(taskId, task.getName(), issueString));
+		log(eventName, payload, new Memento(taskId, task.getName(), issueString));
 
-		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(
-				task.getPoker().getName(), task)));
+		bus.broadcast("updated-task", GSON.toJsonTree(new TaskUpdatedMessage(task.getPoker().getName(), task)));
 	}
 
 	private String getIssuesURL(String repo) {
-		return "https://api.github.com/repos/"
-				+ repo.substring(repo.indexOf('/') + 1) + "issues";
+		return "https://api.github.com/repos/" + repo.substring(repo.indexOf('/') + 1) + "issues";
 	}
 
 	public String getEventName() {

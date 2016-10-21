@@ -1,0 +1,9 @@
+{
+	"requirejs" : {
+		"paths" : {
+         "d3" : "../jslib/d3",
+         "markdown" : "../jslib/markdown",
+         "jquery-ui" : "../jslib/jquery-ui-1.11.4"
+		}
+	}
+}

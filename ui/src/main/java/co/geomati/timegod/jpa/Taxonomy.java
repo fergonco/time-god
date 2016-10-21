@@ -2,6 +2,7 @@ package co.geomati.timegod.jpa;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity
 public class Taxonomy {
@@ -9,6 +10,7 @@ public class Taxonomy {
 	@Id
 	private String name;
 
+	@Lob
 	private String content;
 
 	public String getContent() {
