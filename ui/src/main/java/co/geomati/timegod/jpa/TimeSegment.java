@@ -2,14 +2,17 @@ package co.geomati.timegod.jpa;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 @Entity
 public class TimeSegment {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "timeSegmentSequence")
+	@SequenceGenerator(name = "timeSegmentSequence")
 	private long id;
 
 	private long start;

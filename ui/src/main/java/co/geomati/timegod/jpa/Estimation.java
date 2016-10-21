@@ -2,14 +2,17 @@ package co.geomati.timegod.jpa;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 
 @Entity
 public class Estimation {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "estimationSequence")
+	@SequenceGenerator(name = "estimationSequence")
 	private long id;
 
 	@OneToOne
