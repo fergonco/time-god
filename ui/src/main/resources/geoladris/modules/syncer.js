@@ -1,11 +1,13 @@
-define([ "message-bus", "websocket-bus" ], function(bus, wsbus) {
+define([ "message-bus", "websocket-bus", "auth-user" ], function(bus, wsbus, authUser) {
 
    var developers = [];
    var pokers = [];
 
    bus.listen("modules-loaded", function(e, message) {
-      wsbus.send("get-developers");
-      wsbus.send("get-pokers");
+      if (authUser != null) {
+         wsbus.send("get-developers");
+         wsbus.send("get-pokers");
+      }
    });
 
    /*
