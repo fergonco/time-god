@@ -1,17 +1,12 @@
-define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbus, uiValues, d3) {
+define([ "message-bus", "websocket-bus", "ui-values", "d3", "auth-user" ], function(bus, wsbus, uiValues, d3, authUser) {
 
    var weekdayNames = [ "Domingo LOL", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado LOL" ];
 
    var txt = null;
    var currentTask = null;
-   var developerName = null;
 
    var currentDate = null;
    var currentTime = null;
-
-   bus.listen("set-user", function(e, userName) {
-      developerName = userName;
-   });
 
    function dayInc(sign) {
       currentDate = new Date(currentDate.getTime() + sign * 24 * 60 * 60 * 1000);
@@ -140,7 +135,7 @@ define([ "message-bus", "websocket-bus", "ui-values", "d3" ], function(bus, wsbu
                         "timeStart" : time.start,
                         "timeEnd" : time.end,
                         "keywords" : keywords,
-                        "developerName" : developerName
+                        "developerName" : authUser
                      });
                   },
                   "closeAction" : function() {

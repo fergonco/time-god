@@ -1,27 +1,19 @@
-define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user", "auth" ], function(bus, wsbus, uiValues,
+define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user" ], function(bus, wsbus, uiValues,
    latinize, authUser) {
 
-   var userName = null;
    var dlgAskPokersId = "dlg-ask-pokers";
    var pokers = [];
 
-   bus.listen("modules-loaded", function() {
-      bus.send("show-window", [ "developers" ]);
+   var div = document.createElement("div");
+   div.id = "divLogin";
+   document.body.appendChild(div);
 
+   bus.listen("modules-loaded", function() {
       bus.send("ui-element:create", {
          "div" : "lblUserName",
          "parentDiv" : null,
          "type" : "div",
          "html" : authUser == null ? "No identificado" : "Hola " + authUser
-      });
-
-      bus.listen("set-user", function(e, newUserName) {
-         userName = newUserName;
-         bus.send("ui-set-content", [ {
-            "div" : "lblUserName",
-            "html" : "Hola " + newUserName
-         } ]);
-         bus.send("ui-show", "btn-removeTimeReport");
       });
 
       bus.send("ui-button:create", {
@@ -38,6 +30,12 @@ define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user", "
          "sendEventName" : "remove-time-report"
       });
       bus.send("ui-hide", "btn-removeTimeReport");
+
+      if (authUser != null) {
+         bus.send("ui-show", "btn-removeTimeReport");
+         bus.send("show-window", [ "pokers" ]);
+      }
+
    });
 
    bus.listen("ui-update-poker-list", function(e, newPokers) {
@@ -107,7 +105,7 @@ define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user", "
             if (value.trim().length > 0) {
                wsbus.send("remove-time-report", {
                   "id" : value.trim(),
-                  "developerName" : userName
+                  "developerName" : authUser
                });
             }
          }

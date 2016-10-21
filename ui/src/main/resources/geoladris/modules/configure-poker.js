@@ -1,6 +1,5 @@
-define([ "message-bus", "websocket-bus", "ui-values", "editableList" ], function(bus, wsbus, uiValues, editableList) {
+define([ "message-bus", "websocket-bus", "ui-values", "editableList", "auth-user" ], function(bus, wsbus, uiValues, editableList, authUser) {
 
-   var userName = null;
 
    bus.listen("configure-poker", function(e, poker) {
       var issueRepositories = poker.issueRepositories ? poker.issueRepositories.slice(0) : [];
@@ -71,7 +70,7 @@ define([ "message-bus", "websocket-bus", "ui-values", "editableList" ], function
                "pokerName" : poker.name,
                "issueRepositories" : issueRepositories,
                "wikiRepository" : uiValues.get(pokerConfigurationId + "-wiki-root"),
-               "developerName" : userName
+               "developerName" : authUser
             });
          },
          "div" : pokerConfigurationId
@@ -79,8 +78,4 @@ define([ "message-bus", "websocket-bus", "ui-values", "editableList" ], function
       bus.send("jsdialogs.confirm", [ dialogOptions ]);
 
    });
-   bus.listen("set-user", function(e, newUserName) {
-      userName = newUserName;
-   });
-
 });

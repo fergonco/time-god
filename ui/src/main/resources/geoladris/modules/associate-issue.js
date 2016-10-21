@@ -1,6 +1,5 @@
-define([ "message-bus", "websocket-bus", "ui-values", "issues" ], function(bus, wsbus, uiValues, issues) {
+define([ "message-bus", "websocket-bus", "ui-values", "issues", "auth-user" ], function(bus, wsbus, uiValues, issues, authUser) {
 
-   var userName = null;
    var dialogDOMId = "dlgAssociateIssues";
 
    bus.listen("associate-issue", function(e, taskAndRepo) {
@@ -46,16 +45,12 @@ define([ "message-bus", "websocket-bus", "ui-values", "issues" ], function(bus, 
                "taskId" : taskId,
                "issueNumbers" : issueNumbers,
                "repository" : repository,
-               "developerName" : userName
+               "developerName" : authUser
             });
          },
          "div" : dialogDOMId
       };
       bus.send("jsdialogs.confirm", [ dialogOptions ]);
-   });
-
-   bus.listen("set-user", function(e, newUserName) {
-      userName = newUserName;
    });
 
 });

@@ -3,7 +3,7 @@
 		"auth" : {
 			"button" : {
 				"div" : "auth-button",
-				"parentDiv" : "developer-list"
+				"parentDiv" : "divLogin"
 			}
 		}
 	}

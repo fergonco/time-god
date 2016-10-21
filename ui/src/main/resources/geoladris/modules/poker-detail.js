@@ -1,7 +1,6 @@
-define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issues" ], function(d3, bus, wsbus,
-   editableList, latinize, issues) {
+define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issues", "auth-user" ], function(d3, bus, wsbus,
+   editableList, latinize, issues, authUser) {
 
-   var userName = null;
    var poker = null;
    var pokerName = null;
    var currentView = null;
@@ -62,7 +61,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
          if (type == "event") {
             bus.stopListen("taxonomy-processed", eventTaxonomyListener);
             wsbus.send("add-poker-event", {
-               "developerName" : userName,
+               "developerName" : authUser,
                "pokerName" : poker.name,
                "timestamp" : new Date().getTime(),
                "keywords" : keywords
@@ -83,7 +82,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
 
    bus.listen("totalCreditsUpdated", function(e, value) {
       wsbus.send("change-poker-totalCredits", {
-         "developerName" : userName,
+         "developerName" : authUser,
          "pokerName" : poker.name,
          "totalCredits" : value
       });
@@ -136,7 +135,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       selection.append("input")//
       .attr("type", "text")//
       .attr("value", function(task) {
-         var estimation = task.estimations[userName];
+         var estimation = task.estimations[authUser];
          return estimation ? estimation : "";
       })//
       .on("click", function(task) {
@@ -144,10 +143,10 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       })//
       .on("change", function(task) {
          wsbus.send("change-task-user-credits", {
-            "userName" : userName,
+            "userName" : authUser,
             "taskId" : task.id,
             "credits" : this.value,
-            "developerName" : userName
+            "developerName" : authUser
          });
 
       });
@@ -194,7 +193,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
                wsbus.send("change-task-keywords", {
                   "taskId" : task.id,
                   "keywords" : keywords,
-                  "developerName" : userName
+                  "developerName" : authUser
                });
             }
          };
@@ -204,7 +203,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
          wsbus.send("change-task-common-credits", {
             "taskId" : task.id,
             "credits" : this.value,
-            "developerName" : userName
+            "developerName" : authUser
          });
 
       });
@@ -330,7 +329,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
    bus.listen("toggle-task-status", function(e, task) {
       wsbus.send("toggle-task-status", {
          "taskId" : task.id,
-         "developerName" : userName
+         "developerName" : authUser
       });
    });
 
@@ -364,7 +363,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
    list.add(function(text) {
       wsbus.send("add-task-to-poker", {
          "pokerName" : poker.name,
-         "developerName" : userName,
+         "developerName" : authUser,
          "task" : {
             "name" : text,
             "estimations" : {},
@@ -378,7 +377,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
    list.remove(function(task) {
       wsbus.send("remove-task", {
          "taskId" : task.id,
-         "developerName" : userName
+         "developerName" : authUser
       });
    });
 
@@ -534,7 +533,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
             "message" : "Introduce el nombre de la issue",
             "okAction" : function(value) {
                wsbus.send("add-task-issue", {
-                  "developerName" : userName,
+                  "developerName" : authUser,
                   "repository" : repository,
                   "title" : value,
                   "taskId" : task.id
@@ -560,7 +559,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
          "message" : "Quieres desasociar la issue #" + issue.getNumber() + " de la tarea?",
          "okAction" : function() {
             wsbus.send("dissociate-task-issue", {
-               "developerName" : userName,
+               "developerName" : authUser,
                "taskId" : taskAndIssue.task.id,
                "issueURL" : taskAndIssue.issueURL
             });
@@ -575,7 +574,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
             wsbus.send("change-task-name", {
                "taskId" : task.id,
                "name" : value,
-               "developerName" : userName
+               "developerName" : authUser
             });
          },
          "initialValue" : task.name
@@ -694,9 +693,5 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
 
       return total;
    }
-
-   bus.listen("set-user", function(e, newUserName) {
-      userName = newUserName;
-   });
 
 });
