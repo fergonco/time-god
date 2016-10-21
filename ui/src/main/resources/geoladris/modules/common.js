@@ -16,23 +16,21 @@ define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user" ],
          "html" : authUser == null ? "No identificado" : "Hola " + authUser
       });
 
-      bus.send("ui-button:create", {
-         "div" : "btn-timeReport",
-         "parentDiv" : null,
-         "text" : "Informe reportes de tiempo",
-         "sendEventName" : "show-time-report"
-      });
-
-      bus.send("ui-button:create", {
-         "div" : "btn-removeTimeReport",
-         "parentDiv" : null,
-         "text" : "Eliminar informe de tiempo",
-         "sendEventName" : "remove-time-report"
-      });
-      bus.send("ui-hide", "btn-removeTimeReport");
-
       if (authUser != null) {
-         bus.send("ui-show", "btn-removeTimeReport");
+         bus.send("ui-button:create", {
+            "div" : "btn-timeReport",
+            "parentDiv" : null,
+            "text" : "Informe reportes de tiempo",
+            "sendEventName" : "show-time-report"
+         });
+
+         bus.send("ui-button:create", {
+            "div" : "btn-removeTimeReport",
+            "parentDiv" : null,
+            "text" : "Eliminar informe de tiempo",
+            "sendEventName" : "remove-time-report"
+         });
+
          bus.send("show-window", [ "pokers" ]);
       }
 
