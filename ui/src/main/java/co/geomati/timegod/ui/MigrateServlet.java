@@ -49,7 +49,8 @@ public class MigrateServlet extends HttpServlet {
 					TimeSegment.class, Taxonomy.class, Task.class, Poker.class };
 			List<Object> entities = new ArrayList<>();
 			for (Class<?> entityClass : entityClasses) {
-				List queryResult = h2em.createQuery("SELECT p FROM " + entityClass.getSimpleName() + " p", entityClass)
+				List<?> queryResult = h2em
+						.createQuery("SELECT p FROM " + entityClass.getSimpleName() + " p", entityClass)
 						.getResultList();
 				entities.addAll(queryResult);
 			}
@@ -59,31 +60,9 @@ public class MigrateServlet extends HttpServlet {
 				pgem.persist(entity);
 			}
 			pgem.getTransaction().commit();
-
-			// migrate(h2em, pgem, Developer.class);
-			// migrate(h2em, pgem, Estimation.class);
-			// migrate(h2em, pgem, Event.class);
-			// migrate(h2em, pgem, LogEvent.class);
-			// migrate(h2em, pgem, TimeSegment.class);
-			// migrate(h2em, pgem, Taxonomy.class);
-			// migrate(h2em, pgem, Task.class);
-			// migrate(h2em, pgem, Poker.class);
-
 			resp.setStatus(200);
 		}
 
 	}
 
-	private static <T> void migrate(EntityManager h2em, EntityManager pgem, Class<T> entityClass) {
-
-		String qlString = "SELECT p FROM " + entityClass.getSimpleName() + " p";
-		List<T> entities = h2em.createQuery(qlString, entityClass).getResultList();
-		pgem.getTransaction().begin();
-		for (T entity : entities) {
-			System.out.println(entityClass.getSimpleName());
-			h2em.detach(entity);
-			pgem.persist(entity);
-		}
-		pgem.getTransaction().commit();
-	}
 }

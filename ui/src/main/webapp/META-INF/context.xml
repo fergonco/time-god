@@ -29,8 +29,8 @@
 
 	<Realm className="org.apache.catalina.realm.DataSourceRealm"
 		localDataSource="true" digest="MD5" dataSourceName="jdbc/timegod"
-		userTable="auth.users" userNameCol="name" userCredCol="pass"
-		userRoleTable="auth.user_roles" roleNameCol="role">
+		userTable="app.users" userNameCol="name" userCredCol="password"
+		userRoleTable="app.user_roles" roleNameCol="role">
 	</Realm>
 
 

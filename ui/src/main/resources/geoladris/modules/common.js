@@ -1,4 +1,5 @@
-define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth" ], function(bus, wsbus, uiValues, latinize) {
+define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user", "auth" ], function(bus, wsbus, uiValues,
+   latinize, authUser) {
 
    var userName = null;
    var dlgAskPokersId = "dlg-ask-pokers";
@@ -11,7 +12,7 @@ define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth" ], func
          "div" : "lblUserName",
          "parentDiv" : null,
          "type" : "div",
-         "html" : "No identificado"
+         "html" : authUser == null ? "No identificado" : "Hola " + authUser
       });
 
       bus.listen("set-user", function(e, newUserName) {
