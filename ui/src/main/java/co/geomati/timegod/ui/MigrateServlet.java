@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -41,7 +42,11 @@ public class MigrateServlet extends HttpServlet {
 		EntityManagerFactory pgemf = Persistence.createEntityManagerFactory("local-db-pg", propertiesMap);
 		EntityManager pgem = pgemf.createEntityManager();
 
-		List<Developer> pgDevelopers = pgem.createQuery("SELECT p FROM Developer p", Developer.class).getResultList();
+		List<Developer> pgDevelopers = new ArrayList<>();
+		try {
+			pgem.createQuery("SELECT p FROM Developer p", Developer.class).getResultList();
+		} catch (PersistenceException e) {
+		}
 		if (pgDevelopers.size() > 0) {
 			resp.sendError(HttpServletResponse.SC_CONFLICT, "PG database has data");
 		} else {
