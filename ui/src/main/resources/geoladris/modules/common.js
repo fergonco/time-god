@@ -18,6 +18,13 @@ define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user" ],
 
       if (authUser != null) {
          bus.send("ui-button:create", {
+            "div" : "btn-changePassword",
+            "parentDiv" : null,
+            "text" : "Cambiar password",
+            "sendEventName" : "change-password"
+         });
+
+         bus.send("ui-button:create", {
             "div" : "btn-timeReport",
             "parentDiv" : null,
             "text" : "Informe reportes de tiempo",
@@ -59,6 +66,20 @@ define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user" ],
       bus.send("ui-dialog:close", dlgAskPokersId);
    });
 
+   bus.listen("change-password", function(e, message) {
+      bus.send("jsdialogs.question", [ {
+         "message" : "Introduce el nuevo password",
+         "okAction" : function(value) {
+            if (value.trim().length > 0) {
+               wsbus.send("change-password", {
+                  "newPassword" : value.trim(),
+                  "developerName" : authUser
+               });
+            }
+         }
+      } ]);
+   });
+   
    bus.listen("show-time-report", function(e, message) {
       bus.send("ui-dialog:create", {
          div : dlgAskPokersId,

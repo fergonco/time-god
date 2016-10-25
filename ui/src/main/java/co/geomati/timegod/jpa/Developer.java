@@ -9,6 +9,8 @@ public class Developer {
 	@Id
 	private String name;
 
+	private String password;
+
 	public String getName() {
 		return name;
 	}
@@ -18,4 +20,7 @@ public class Developer {
 		return name;
 	}
 
+	public void setPassword(String password) {
+		this.password = password;
+	}
 }

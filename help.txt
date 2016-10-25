@@ -1,5 +1,12 @@
+# set persistence.xml and context.xml to pgserver:5432 and proper password
 docker build . -t fergonco/timegod
 docker run -d -it -p 8888:8080 -e TIMEGOD_GITHUB_API_USER=geobotmatico -e TIMEGOD_GITHUB_API_PASSWORD= -v /app-conf/timegod/:/app-conf/timegod/ --name timegod --link pg:pgserver fergonco/timegod
 docker run -p54322:5432 -d -t -v /app-conf/postgresql/:/var/lib/postgresql -e POSTGRES_USER=geomatico -e POSTGRES_PASS= --name pg kartoza/postgis:9.3-2.1
+
+# next deploy
+
+alter table app."Developer" add column password varchar();
+update app."Developer" set password =md5('bohludo') ;
+
 
 

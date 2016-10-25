@@ -37,7 +37,7 @@
 		<class>co.geomati.timegod.jpa.LogEvent</class>
 
 		<properties>
-			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://pgserver:5432/timegod" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:54322/timegod" />
 			<property name="javax.persistence.jdbc.user" value="timegod" />
 			<property name="javax.persistence.jdbc.password" value="5staranalyzer" />
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
