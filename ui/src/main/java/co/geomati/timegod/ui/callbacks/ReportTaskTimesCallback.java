@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 
 import co.geomati.timegod.jpa.Developer;
 import co.geomati.timegod.jpa.Task;
+import co.geomati.timegod.jpa.Taxonomy;
 import co.geomati.timegod.jpa.TimeSegment;
 import co.geomati.timegod.ui.DBUtils;
 import co.geomati.websocketBus.Callback;
@@ -87,15 +88,8 @@ public class ReportTaskTimesCallback extends AbstractLoggingCallback implements
 	}
 
 	private void checkKeywords(String[] keywords) throws CallbackException {
-		InputStream input = this.getClass().getResourceAsStream(
-				"time-taxonomy.json");
-		String taxonomyContent;
-		try {
-			taxonomyContent = IOUtils.toString(input);
-		} catch (IOException e) {
-			throw new CallbackException(
-					"Internal error. Could not check taxonomy", e);
-		}
+		EntityManager em = DBUtils.getEntityManager();
+		String taxonomyContent = em.find(Taxonomy.class, "time").getContent();
 		JsonObject taxonomy = (JsonObject) new JsonParser()
 				.parse(taxonomyContent);
 		List<String> keywordList = new ArrayList<String>();

@@ -9,4 +9,23 @@ alter table app."Developer" add column password varchar();
 update app."Developer" set password =md5('bohludo') ;
 
 
-
+# update taxonomy
+update app."Taxonomy" set content ='
+{
+   "type" : "sequence",
+   "children" : [ {
+      "name" : "interrupciones",
+      "text" : "Interrupciones durante la actividad",
+      "type" : "choice",
+      "children" : [ {
+         "name" : "interrupciones_ninguna",
+         "text" : "Ninguna"
+      }, {
+         "name" : "interrupciones_ocasional",
+         "text" : "Ocasional"
+      }, {
+         "name" : "interrupciones_regular",
+         "text" : "Regularmente"
+      } ]
+   }]
+}' where name='time';

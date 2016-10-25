@@ -15,6 +15,7 @@ public class DBUtils {
 	public static EntityManager getEntityManager() {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory(JPA_CONF_NAME, Collections
 				.singletonMap(PersistenceUnitProperties.SESSION_CUSTOMIZER, SchemaSessionCustomizer.class.getName()));
+		emf.getCache().evictAll();
 		EntityManager em = emf.createEntityManager();
 		return em;
 	}
