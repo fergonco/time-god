@@ -55,10 +55,10 @@ define([ "message-bus", "websocket-bus", "ui-values", "latinize", "auth-user" ],
       var ret = "\n";
       var total = 0;
       for ( var developerName in developerAccum) {
-         ret += "* Acumulado " + developerName + ": " + Math.round(developerAccum[developerName] / 3600000) + "h\n";
+         ret += "* Acumulado " + developerName + ": " + Math.round(developerAccum[developerName] / 3600000.0) + "h\n";
          total += developerAccum[developerName];
       }
-      ret += "* Acumulado total: " + Math.round(total / 3600000) + "\n\n\n";
+      ret += "* Acumulado total: " + Math.round(total / 3600000.0) + "\n\n\n";
       return ret;
    }
 
