@@ -7,6 +7,7 @@ docker run -p54322:5432 -d -t -v /app-conf/postgresql/:/var/lib/postgresql -e PO
 
 alter table app."Developer" add column password varchar();
 update app."Developer" set password =md5('bohludo') ;
+alter table app."Poker" add column status integer default 0;
 
 # update taxonomy
 update app."Taxonomy" set content ='

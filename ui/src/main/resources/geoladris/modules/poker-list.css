@@ -5,3 +5,8 @@
 .poker-entry .bricksui-span-button {
 	float: right;
 }
+
+.closed-poker {
+	opacity: 0.16;
+}
+   

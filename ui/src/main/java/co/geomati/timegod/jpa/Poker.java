@@ -25,6 +25,11 @@ public class Poker {
 	private String[] issueRepositories;
 	private String wikiRepository;
 
+	/**
+	 * 0 open, 1 closed
+	 */
+	private int status = 0;
+
 	public String getName() {
 		return name;
 	}
@@ -72,5 +77,13 @@ public class Poker {
 
 	public void setWikiRepository(String wikiRepository) {
 		this.wikiRepository = wikiRepository;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 }

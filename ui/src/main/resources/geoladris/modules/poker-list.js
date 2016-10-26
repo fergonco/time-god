@@ -75,7 +75,30 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "auth-user" ], fu
          }
          return ret;
       });
+      
+      selection//
+      .append("span")//
+      .each(function(d) {
+         bus.send("ui-button:create", {
+            "element" : this,
+            "text" : d.status == 0 ? "Cerrar" : "Reabrir",
+            "sendEventName" : "toggle-poker-status",
+            "sendEventMessage" : d
+         });
+      });
+      
+      selection//
+      .classed("closed-poker", function(d) {
+         return d.status == 1;
+      });
 
+   });
+
+   bus.listen("toggle-poker-status", function(e, poker) {
+      wsbus.send("toggle-poker-status", {
+         "pokerName" : poker.name,
+         "developerName" : authUser
+      });
    });
 
    bus.listen("show-window", function(e, window) {
