@@ -1,5 +1,5 @@
-define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issues", "auth-user" ], function(d3, bus, wsbus,
-   editableList, latinize, issues, authUser) {
+define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issues", "auth-user", "task-utils" ], function(d3, bus, wsbus,
+   editableList, latinize, issues, authUser, taskUtils) {
 
    var poker = null;
    var pokerName = null;
@@ -307,23 +307,13 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       selection//
       .append("progress")//
       .attr("title", function(task) {
-         return getTotalTime(task) + " de " + task.commonEstimation;
+         return taskUtils.getConsumedTime(task) + " de " + task.commonEstimation;
       })//
       .attr("max", "100")//
       .attr("value", function(task) {
-         var acum = getTotalTime(task);
+         var acum = taskUtils.getConsumedTime(task);
          return 100 * acum / task.commonEstimation;
       });
-   }
-   function getTotalTime(task) {
-      var acum = 0;
-      if (task.timeSegments) {
-         for (var i = 0; i < task.timeSegments.length; i++) {
-            var timeSegment = task.timeSegments[i];
-            acum += timeSegment.end - timeSegment.start;
-         }
-      }
-      return acum / (1000 * 60 * 60);
    }
 
    bus.listen("toggle-task-status", function(e, task) {
@@ -688,7 +678,7 @@ define([ "d3", "message-bus", "websocket-bus", "editableList", "latinize", "issu
       var total = 0;
       for (var i = 0; i < poker.tasks.length; i++) {
          var task = poker.tasks[i];
-         total += getTotalTime(task);
+         total += taskUtils.getConsumedTime(task);
       }
 
       return total;
