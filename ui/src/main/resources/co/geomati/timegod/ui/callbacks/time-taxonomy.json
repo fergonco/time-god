@@ -1,51 +1,6 @@
 {
    "type" : "sequence",
    "children" : [ {
-      "name" : "interrupciones",
-      "text" : "Interrupciones durante la actividad",
-      "type" : "choice",
-      "children" : [ {
-         "name" : "interrupciones_ninguna",
-         "text" : "Ninguna"
-      }, {
-         "name" : "interrupciones_ocasional",
-         "text" : "Ocasional"
-      }, {
-         "name" : "interrupciones_regular",
-         "text" : "Regularmente"
-      } ]
-   }, {
-      "name" : "urgencia",
-      "text" : "Urgencia de la tarea",
-      "type" : "choice",
-      "children" : [ {
-         "name" : "urgencia_maxima",
-         "text" : "Máxima"
-      }, {
-         "name" : "urgencia_hay_presion",
-         "text" : "Hay presión"
-      }, {
-         "name" : "urgencia_ritmo_normal",
-         "text" : "Ritmo normal (a este ritmo es suficiente)"
-      }, {
-         "name" : "urgencia_ninguna_prisa",
-         "text" : "No hay ninguna prisa, vamos muy bien de tiempo"
-      } ]
-   }, {
-      "name" : "motivacion",
-      "text" : "Motivación para realizar la actividad",
-      "type" : "choice",
-      "children" : [ {
-         "name" : "motivacion_ninguna",
-         "text" : "Ninguna"
-      }, {
-         "name" : "motivacion_normal",
-         "text" : "Normal"
-      }, {
-         "name" : "motivacion_mucha",
-         "text" : "Mucha"
-      } ]
-   }, {
       "name" : "satisfaccion",
       "text" : "Satisfacción por el trabajo realizado",
       "type" : "choice",
@@ -57,7 +12,7 @@
          "text" : "Normal"
       }, {
          "name" : "satisfaccion_ninguna",
-         "text" : "Ninguna"
+         "text" : "Poca"
       } ]
    } ]
 

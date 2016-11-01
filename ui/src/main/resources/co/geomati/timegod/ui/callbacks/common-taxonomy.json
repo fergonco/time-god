@@ -1,15 +1,194 @@
 {
-   "type" : "sequence",
-   "children" : [ {
-      "name" : "placeholder",
-      "text" : "Compilar y enviar a Fernando keywords que representen criterios que influyen en la estimación",
-      "type" : "choice",
-      "children" : [ {
-         "name" : "si",
-         "text" : "Sí"
-      }, {
-         "name" : "no_cuesta_nada",
-         "text" : "No cuesta nada"
-      } ]
-   } ]
+	"type": "sequence",
+	"children": [
+		{
+			"name": "language",
+			"text": "Tecnologías",
+			"type": "multiple-choice",
+			"children": [
+				{
+					"name": "java",
+					"text": "Java"
+				},
+				{
+					"name": "javascript",
+					"text": "Javascript"
+				},
+				{
+					"name": "python",
+					"text": "Python"
+				}
+			]
+		},
+		{
+			"name": "boot-latency",
+			"text": "Hay que montar un entorno de desarrollo complejo que nadie del equipo tiene montado",
+			"type": "choice",
+			"children": [
+				{
+					"name": "boot-latency-yes",
+					"text": "Sí"
+				},
+				{
+					"name": "boot-latency-no",
+					"text": "No"
+				}
+			]
+		},
+		{
+			"name": "coupling",
+			"text": "Acoplamiento del módulo a modificar",
+			"type": "choice",
+			"children": [
+				{
+					"name": "coupling-no",
+					"text": "Desacoplado/Desarrollo nuevo"
+				},
+				{
+					"name": "coupling-small",
+					"text": "Uso eventual del módulo desde otras partes del sistema"
+				},
+				{
+					"name": "coupling-big",
+					"text": "Uso extensivo del módulo en todo el proyecto"
+				}
+			]
+		},
+		{
+			"name": "existing-code-coverage",
+			"text": "Cobertura tests del código a modificar",
+			"type": "choice",
+			"children": [
+				{
+					"name": "existing-code-coverage-none",
+					"text": "Ninguna o anecdótica"
+				},
+				{
+					"name": "existing-code-coverage-initial",
+					"text": "Cobertura anecdótica / Unos pocos módulos"
+				},
+				{
+					"name": "existing-code-coverage-halfmore",
+					"text": "La mitad del código o más"
+				}
+			]
+		},
+		{
+			"name": "codebase",
+			"text": "Comprensión del código a modificar",
+			"type": "choice",
+			"children": [
+				{
+					"name": "codebase-simple",
+					"text": "Simple y documentado/Desarrollo nuevo"
+				},
+				{
+					"name": "codebase-difficult",
+					"text": "Confuso / Complicado / No documentado"
+				}
+			]
+		},
+		{
+			"name": "backwards-compatibility",
+			"text": "Se debe respetar la compatibilidad hacia atrás",
+			"type": "choice",
+			"children": [
+				{
+					"name": "backwards-compatibility-yes",
+					"text": "Sí"
+				},
+				{
+					"name": "backwards-compatibility-no",
+					"text": "No"
+				}
+			]
+		},
+		{
+			"name": "documentation-required",
+			"text": "Se debe documentar",
+			"type": "choice",
+			"children": [
+				{
+					"name": "documentation-required-yes",
+					"text": "Sí"
+				},
+				{
+					"name": "documentation-required-no",
+					"text": "No"
+				}
+			]
+		},
+		{
+			"name": "learning-required",
+			"text": "Hay que aprender determinadas tecnologías para realizar gran parte de la funcionalidadmen ",
+			"type": "choice",
+			"children": [
+				{
+					"name": "learning-required-yes",
+					"text": "Sí"
+				},
+				{
+					"name": "learning-required-no",
+					"text": "No"
+				}
+			]
+		},
+		{
+			"name": "certainty-estimation",
+			"text": "Certeza subjetiva de la estimación",
+			"type": "choice",
+			"children": [
+				{
+					"name": "certainty-estimation-low",
+					"text": "Muy poca"
+				},
+				{
+					"name": "certainty-estimation-medium",
+					"text": "Media"
+				},
+				{
+					"name": "certainty-estimation-high",
+					"text": "Alta"
+				}
+			]
+		},
+		{
+			"name": "user-interface",
+			"text": "Se va a desarrollar una interfaz de usuario",
+			"type": "choice",
+			"children": [
+				{
+					"name": "user-interface-yes",
+					"text": "Sí"
+				},
+				{
+					"name": "user-interface-no",
+					"text": "No"
+				}
+			]
+		},
+		{
+			"name": "developer",
+			"text": "Desarrolladores",
+			"type": "multiple-choice",
+			"children": [
+				{
+					"name": "developer-victor",
+					"text": "Víctor"
+				},
+				{
+					"name": "developer-micho",
+					"text": "Micho"
+				},
+				{
+					"name": "developer-fernando",
+					"text": "Fernando"
+				},
+				{
+					"name": "developer-vicente",
+					"text": "Vicente"
+				}
+			]
+		}
+	]
 }

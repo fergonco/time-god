@@ -22,8 +22,9 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
       .attr("class", "modal-overlay")//
       .append("div")//
       .attr("id", taxonomerId)//
+      .style("width", "50vw")//
       .style("top", bounds.bottom + "px")//
-      .style("left", bounds.right + "px");
+      .style("right", "25vw");
 
       bus.send("ui-element:create", {
          "div" : "taxonomy-keywords",
@@ -118,16 +119,13 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
                refresh(taxonomy);
             }
          });
+         bus.send("ui-remove", "btnDone");
          if (taxonomy.type == "multiple-choice") {
-            bus.send("ui-remove", "btnDone");
             bus.send("ui-button:create", {
                "div" : "btnDone",
                "parentDiv" : "taxonomer",
                "text" : "Hecho",
                "sendEventName" : "btnDone-click"
-            });
-            bus.listen("btnDone-click", function() {
-               next();
             });
          }
          bus.send("ui-remove", "btnRestartTaxonomer");
@@ -137,15 +135,18 @@ define([ "message-bus", "websocket-bus", "d3" ], function(bus, wsbus, d3) {
             "text" : "Reiniciar",
             "sendEventName" : "btnRestartTaxonomer-click"
          });
-         bus.listen("btnRestartTaxonomer-click", function() {
-            initialize();
-            refresh(root);
-         });
       } else {
          next();
       }
       updateKeywords();
    }
+   bus.listen("btnRestartTaxonomer-click", function() {
+      initialize();
+      refresh(root);
+   });
+   bus.listen("btnDone-click", function() {
+      next();
+   });
 
    function updateKeywords() {
       var keywordSelection = d3.select("#taxonomy-keywords").selectAll(".keyword").data(keywords);
